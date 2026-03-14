@@ -58,7 +58,6 @@ const grid = document.getElementById('presentationsGrid');
     let activeCategory = null;
     let searchQuery = '';
 
-    // לוגיקת החלפת ערכת נושא
     const applyTheme = (theme) => {
         if (theme === 'light') {
             document.body.classList.add('light-blue-mode');
@@ -79,7 +78,6 @@ const grid = document.getElementById('presentationsGrid');
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) applyTheme(savedTheme);
 
-    // פונקציית עזר לחישוב שקיפות צבעים
     function hexToRgba(hex, opacity) { 
         let r = 0, g = 0, b = 0; 
         if (hex.length == 4) { r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; } 
@@ -96,6 +94,7 @@ const grid = document.getElementById('presentationsGrid');
         else window.userChoices.push(idStr);
         if (window.saveUserPreferences) await window.saveUserPreferences(window.userChoices);
         if (activeCategory === 'הבחירות שלי') renderPresentations();
+        renderFilters(); // עדכון המונים בסינון
     };
 
     window.setFilter = function(category) { 
@@ -115,20 +114,23 @@ const grid = document.getElementById('presentationsGrid');
         const myChoicesCat = 'הבחירות שלי';
         const otherCategories = categories.filter(cat => cat !== myChoicesCat);
 
-        // רינדור "הבחירות שלי" לשורה נפרדת
+        // רינדור כפתור הבחירות שלי לשורה הנפרדת
         myChoicesContainer.innerHTML = `
             <button onclick="setFilter('${myChoicesCat}')" class="filter-btn ${activeCategory === myChoicesCat ? 'active-filter' : ''}">
-                <span class="category-num-badge" style="background: ${categoryStyles[myChoicesCat].color}">${categoryMap[myChoicesCat]}</span>
+                <span class="category-num-badge" style="background: ${categoryStyles[myChoicesCat].color}">${window.userChoices.length}</span>
                 ${myChoicesCat}
             </button>
         `;
 
-        // רינדור שאר הקטגוריות לסרגל הראשי
-        desktopFilterBar.innerHTML = otherCategories.map(cat => `
+        // רינדור שאר הקטגוריות לסרגל המרכזי
+        desktopFilterBar.innerHTML = otherCategories.map(cat => {
+            const count = presentations.filter(p => p.category === cat).length;
+            return `
             <button onclick="setFilter('${cat}')" class="filter-btn ${activeCategory === cat ? 'active-filter' : ''}">
-                <span class="category-num-badge" style="background: ${categoryStyles[cat].color}">${categoryMap[cat]}</span>
+                <span class="category-num-badge" style="background: ${categoryStyles[cat].color}">${count}</span>
                 ${cat}
-            </button>`).join('');
+            </button>`;
+        }).join('');
         
         if (mobileCategoryLabel) mobileCategoryLabel.innerText = activeCategory || "כל הקטגוריות";
     }
@@ -138,8 +140,13 @@ const grid = document.getElementById('presentationsGrid');
         let filtered = activeCategory === 'הבחירות שלי' ? presentations.filter(p => window.userChoices.includes(String(p.id))) : 
                        (activeCategory ? presentations.filter(p => p.category === activeCategory) : presentations);
         
-        if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery));
+        if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery));
         
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-500 font-bold">לא נמצאו כלים...</div>`;
+            return;
+        }
+
         grid.innerHTML = filtered.map(p => {
             const style = categoryStyles[p.category] || categoryStyles['default'];
             const isChecked = window.userChoices.includes(String(p.id)) ? 'checked' : '';
@@ -155,18 +162,19 @@ const grid = document.getElementById('presentationsGrid');
                 </div>
                 <div>
                     <div class="category-chip" style="border-right-color: ${style.color}">
-                        <span class="category-num-badge" style="background: ${style.color}">${categoryMap[p.category]}</span>
+                        <span class="category-num-badge" style="background: ${style.color}">${categoryMap[p.category] || 0}</span>
                         ${p.category}
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-2">${p.title}</h3>
-                    <p class="text-white/80 text-sm mb-4">${p.description}</p>
+                    <p class="text-white/90 mb-10 leading-relaxed">${p.description}</p>
                 </div>
                 <div class="flex flex-col gap-4">
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="openModal(${p.id})" class="yellow-action-btn py-2 text-xs">מידע</button>
-                        <a href="${p.siteUrl}" target="_blank" class="yellow-action-btn py-2 text-xs text-center flex items-center justify-center">כניסה</a>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="openModal(${p.id})" class="yellow-action-btn py-3 px-2 text-xs font-bold">מידע</button>
+                        <a href="${p.siteUrl}" target="_blank" class="yellow-action-btn py-3 px-2 text-xs font-bold text-center flex items-center justify-center">כניסה</a>
                     </div>
-                    ${p.driveUrl ? `<a href="${p.driveUrl}" target="_blank" class="bg-orange-600 hover:bg-orange-500 text-white py-2 text-center text-xs font-bold rounded shadow-lg uppercase">צפייה במצגת ההדרכה</a>` : ''}
+                    ${p.guideUrl ? `<a href="${p.guideUrl}" target="_blank" class="py-3 px-4 font-bold text-center text-[10px] tracking-wider border rounded" style="color: #fdba74; border-color: rgba(253, 186, 116, 0.5);">מדריך חשבון חינוך</a>` : ''}
+                    ${p.driveUrl ? `<a href="${p.driveUrl}" target="_blank" class="bg-orange-600 hover:bg-orange-500 text-white py-3 px-4 text-center text-xs font-bold rounded shadow-lg">צפייה במצגת ההדרכה</a>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -182,7 +190,5 @@ const grid = document.getElementById('presentationsGrid');
 
     renderFilters();
     renderPresentations();
-}
-window.initDashboard = initDashboard;();
 }
 window.initDashboard = initDashboard;
