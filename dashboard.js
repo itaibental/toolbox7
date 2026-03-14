@@ -5,11 +5,12 @@ function initDashboard() {
     };
 
     const categoryStyles = {
-        'הבחירות שלי': { color: '#10b981' }, 'שיתופיות': { color: '#22d3ee' }, 
-        'אינטראקטיביות': { color: '#10b981' }, 'עיצוב ויצירה': { color: '#f43f5e' }, 
-        'משחקים': { color: '#6366f1' }, 'כלים שעושים חיים קלים': { color: '#f59e0b' }, 
-        'מאגרי מדיה': { color: '#d946ef' }, 'כלי גוגל': { color: '#8b5cf6' }, 
-        'סימולציות': { color: '#BED4CB' }, 'default': { color: '#3b82f6' }
+        'הבחירות שלי': { color: '#10b981' },
+        'שיתופיות': { color: '#22d3ee' }, 'אינטראקטיביות': { color: '#10b981' },
+        'עיצוב ויצירה': { color: '#f43f5e' }, 'משחקים': { color: '#6366f1' },
+        'כלים שעושים חיים קלים': { color: '#f59e0b' }, 'מאגרי מדיה': { color: '#d946ef' },
+        'כלי גוגל': { color: '#8b5cf6' }, 'סימולציות': { color: '#BED4CB' }, 
+        'default': { color: '#3b82f6' }
     };
     const presentations = [
         { id: 1, title: "Padlet", category: "שיתופיות", driveUrl: "https://drive.google.com/file/d/1EJkXEIy4E1De2FD1pdPY8Ux9jPEQIHe5/view?usp=sharing", siteUrl: "https://padlet.com", description: "לוח קיר דיגיטלי לריכוז רעיונות ותוצרים ויזואליים בזמן אמת.", info: "• ניהול סיעור מוחות כיתתי: כולם כותבים בו-זמנית על קיר אחד משותף.\n• איסוף תוצרי למידה: ריכוז תמונות, קבצים, קישורים וסרטונים שיצרו התלמידים במקום אחד.\n• הערכת עמיתים (Peer Assessment): התלמידים יכולים להגיב זה לזה, לסמן 'לייק' ולדרג עבודות." },
@@ -56,9 +57,10 @@ const grid = document.getElementById('presentationsGrid');
     if (!window.userChoices) window.userChoices = [];
 
     window.toggleChoice = async function(id) {
-        const index = window.userChoices.indexOf(id);
+        const idStr = String(id);
+        const index = window.userChoices.indexOf(idStr);
         if (index > -1) window.userChoices.splice(index, 1);
-        else window.userChoices.push(id);
+        else window.userChoices.push(idStr);
         if (window.saveUserPreferences) await window.saveUserPreferences(window.userChoices);
         if (activeCategory === 'הבחירות שלי') renderPresentations();
     };
@@ -77,17 +79,18 @@ const grid = document.getElementById('presentationsGrid');
 
     function renderPresentations() {
         if (!grid) return;
-        let filtered = activeCategory === 'הבחירות שלי' ? presentations.filter(p => window.userChoices.includes(p.id)) : 
+        let filtered = activeCategory === 'הבחירות שלי' ? presentations.filter(p => window.userChoices.includes(String(p.id))) : 
                        (activeCategory ? presentations.filter(p => p.category === activeCategory) : presentations);
         
         if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery));
         
         grid.innerHTML = filtered.map(p => {
             const style = categoryStyles[p.category] || categoryStyles['default'];
+            const isChecked = window.userChoices.includes(String(p.id)) ? 'checked' : '';
             return `
-            <div class="card-3d p-8 flex flex-col justify-between" style="--category-glow: ${style.color}40;">
+            <div class="card-3d p-8 flex flex-col justify-between" style="--category-color: ${style.color}; --category-glow: ${style.color}40;">
                 <div class="choice-checkbox-container">
-                    <input type="checkbox" class="choice-checkbox" onchange="toggleChoice(${p.id})" ${window.userChoices.includes(p.id) ? 'checked' : ''}>
+                    <input type="checkbox" class="choice-checkbox" onchange="toggleChoice(${p.id})" ${isChecked}>
                     <span class="selected-check">✔️</span>
                 </div>
                 <div>
