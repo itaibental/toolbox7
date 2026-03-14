@@ -1,6 +1,10 @@
+להלן הקובץ `dashboard.js` המלא והמשוחזר, הכולל את כל העדכונים שביקשת: קטגוריית "סימולציות" בצבע המעודכן, קטגוריית "הבחירות שלי", הכלים החדשים (Cymath וסימולטורים של CK-12), מנגנון תיבות הסימון (Checkboxes) והלוגיקה לשמירה וטעינה מול השרת.
+
+```javascript
 function initDashboard() {
+    // מפת קטגוריות כולל "הבחירות שלי" ו"סימולציות"
     const categoryMap = {
-        'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
+        'הבחירות שלי': 0, 'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
         'כלים שעושים חיים קלים': 5, 'מאגרי מדיה': 6, 'כלי גוגל': 7, 'סימולציות': 8
     };
 
@@ -10,7 +14,7 @@ function initDashboard() {
         { id: 34, title: "Google Keep", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1gZaplTezjXfM3xSXFPeqb2HUfgWT8ery/view?usp=drive_link", siteUrl: "https://keep.google.com", description: "פנקס רשימות דיגיטלי לניהול רעיונות ותזכורות.", info: "• ארגון אישי: יצירת פתקיות צבעוניות ורשימות תיוג (To-Do Lists) לניהול משימות יומיות.\n• סנכרון מלא: המידע נגיש מהטלפון ומהמחשב בכל רגע נתון ובזמן אמת.\n• מולטימדיה: הוספת תמונות, הקלטות קוליות (עם תמלול אוטומטי) ושרבוטים לפתקים.\n• חילוץ טקסט (OCR): צילום מסמך והפיכתו לטקסט חי הניתן לעריכה בגוגל דוקס.\n• עבודה שיתופית: שיתוף פתקים עם עמיתים לתכנון משותף של מערכי שיעור או משימות צוות.\n• תזכורות חכמות: הגדרת תזכורות לפי זמן או לפי מיקום גיאוגרפי." },
         { id: 35, title: "Google Tasks", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1U-2v9ww4vafP6P4cDyUZ4Y2Jwdpk-GlM/view?usp=drive_link", siteUrl: "https://tasks.google.com", description: "ניהול משימות פשוט וממוקד המוטמע בתוך המייל והיומן.", info: "• ניהול זמן: יצירת רשימות משימות מהירות לניהול שוטף של העבודה הפדגוגית והאדמיניסטרטיבית.\n• שילוב עם Gmail: הפיכת אימיילים למשימות בתוך Gmail בלחיצת כפור.\n• שילוב עם Calendar: הגדרת תאריכי יעד למשימות, שיופיעו אוטומטית ביומן שלכם.\n• ארגון היררכי: פירוט משימות גדולות לתת-משימות קטנות וברות ביצוע.\n• כלי עזר לתלמידים: פיתוח מיומנויות של ניהול זמן והתארגנות עצמית בלמידה מרחוק או בפרויקטים." },
         { id: 36, title: "Google Sites", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1od4KE3XRaA_71InAjECTQnY864o-DZaK/view?usp=drive_link", siteUrl: "https://sites.google.com", description: "בניית אתרים פשוטה ואינטואיטיבית ללא צורך בכתיבת קוד.", info: "• מרכזי למידה: יצירת אתר המרכז את כל חומרי הלימוד והמשימות עבור נושא מסוים.\n• אתר כיתה: בניית פלטפורמה לתקשורת עם הורים ותלמידים המציגה לוחות זמנים והודעות.\n• פורטפוליו דיגיטלי: תלמידים בונים אתר אישי המציג את ההתקדמות והתוצרים שלהם לאורך השנה.\n• ממשק גרירה והשלכה: הטמעה קלה של קבצי Drive, מצגות וסרטוני YouTube.\n• תצוגה מותאמת: האתר נראה מצוין בטלפונים, טאבלטים ומחשבים באופן אוטומטי.\n• הרשאות: שליטה מלאה על מי יכול לצפות באתר (ציבורי או רק בתוך חשבון הארגון)." },
-        { id: 37, title: "Google Gemini", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1Jkq0NO9GQ2IgdfiWsdDPFv_ctPCoOfeh/view?usp=drive_link", siteUrl: "https://gemini.google.com", description: "עוזר בינה מלאכותית (AI) רב-תחומי ליצירת תוכן ומחקר.", info: "• סיעור מוחות פדגוגי: קבלת רעיונות למערכי שיעור יצירתיים, פתיחות מעניינות ומשימות חקר.\n• כתיבת תוכן: ניסוח מיילים להורים, כתיבת סיפורים קצרים או פישוט טקסטים מורכבים.\n• ניתוח נתונים: העלאת קבצים וקבלת סיכומים, ניתוח טבלאות ומציאת מגמות.\n• Imagen 3: יצירת איורים ותמונות מקוריות לשימוש במצגות ובחומרי לימוד.\n• בינה מלאכותית אחראית: כלי עזר רב עוצמה לשיפור היעילות והיצירתיות של המורה." },
+        { id: 37, title: "Google Gemini", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1Jkq0NO9GQ2IgdfiWsdDPFv_ctPCoOfeh/view?usp=drive_link", siteUrl: "https://gemini.google.com", description: "עוזר בינה מלאכותית (AI) רב-תחומי ליצירת תוכן ומחקר.", info: "• סיעור מוחות פדגוגי: קבלת רעיונות למ מערכי שיעור יצירתיים, פתיחות מעניינות ומשימות חקר.\n• כתיבת תוכן: ניסוח מיילים להורים, כתיבת סיפורים קצרים או פישוט טקסטים מורכבים.\n• ניתוח נתונים: העלאת קבצים וקבלת סיכומים, ניתוח טבלאות ומציאת מגמות.\n• Imagen 3: יצירת איורים ותמונות מקוריות לשימוש במצגות ובחומרי לימוד.\n• בינה מלאכותית אחראית: כלי עזר רב עוצמה לשיפור היעילות והיצירתיות של המורה." },
         { id: 40, title: "Nano Banana", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1qaGQFcsYv12G32TNnCrdTmsuQuakLQ1U/view?usp=drive_link", siteUrl: "https://gemini.google.com", description: "המודל המתקדם של גוגל ליצירת תמונות מרהיבות מטקסט.", info: "• המחשה ויזואלית: יצירת תמונות ריאליסטיות או איורים המבוססים על תיאור מילולי בלבד.\n• שדרוג חומרי למידה: הוספת תוכן ויזואלי ייחודי ומקורי למצגות ודפי עבודה ואתרי Sites.\n• פיתוח דמיון: תלמידים כותבים הנחיות (Prompts) כדי לראות איך התיאור שלהם הופך ליצירה.\n• התאמת סגנון: ניתן לבקש תמונות בסגנונות אמנותיים שונים (ציור שמן, קומיקס, צילום היסטורי ועוד).\n• פתרון מהיר: אין צורך לחפש שעות במנועי חיפוש – פשוט מתארים ומקבלים תמונה מדויקת." },
         { id: 41, title: "Google Gems", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1Jkq0NO9GQ2IgdfiWsdDPFv_ctPCoOfeh/view?usp=drive_link", siteUrl: "https://gemini.google.com/gems", description: "בניית מומחי AI מותאמים אישית לצרכים פדגוגיים ספציפיים.", info: "• מומחים נושאיים: יצירת 'ג'ם' המתמחה במקצוע מסוים (למשל: בוט המתמחה בפיזיקה).\n• הנחיות קבועות: הגדרת 'חוקי משחק' ל-AI כך שתמיד יענה בטון מסוים או ברמת שפה מוגדרת.\n• עוזר הוראה: בניית בוט שעוזר למורה בבדיקת עבודות לפי מחוון ספציפי.\n• תמיכה בתלמידים: יצירת Gems המשמשים כחונכים אישיים לתלמידים בנושאים ממוקדים.\n• שיתוף: ניתן לשתף את ה-Gems שנוצרו עם מורים אחרים בבית הספר." },
         { id: 42, title: "Google Earth", category: "כלי גוגל", driveUrl: "https://drive.google.com/file/d/1eNzEVxvUDarurT1q1Op0zSSZLTmBQ2Fe/view?usp=drive_link", siteUrl: "https://earth.google.com", description: "חקר העולם בתלת-ממד, סיורים וירטואליים ומפות היסטוריות.", info: "• חקר גיאוגרפי: סיור בכל נקודה על פני הגלובוס בתצוגת תלת-ממד מרהיבה לשיעורי גיאוגרפיה.\n• Voyager: גישה לסיורים לימודיים מובנים שהוכנו ע\"י מומחים בנושאי טבע והיסטוריה.\n• Timelapse: צפייה בשינויים שעבר כדור הארץ ב-40 השנים האחרונות (המסת קרחונים, צמיחת ערים).\n• מדידות: כלי למדידת מרחקים ושטחים המאפשר חיבור לשיעורי מתמטיקה בצורה מוחשית.\n• פרויקטים: תלמידים יכולים ליצור 'סיפור מפה' הכולל נקודות ציון עם טקסט ותמונות משלהם." },
@@ -73,12 +77,24 @@ function initDashboard() {
     else { applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
 
     const categoryStyles = {
+        'הבחירות שלי': { color: '#10b981' },
         'שיתופיות': { color: '#22d3ee' }, 'אינטראקטיביות': { color: '#10b981' },
         'עיצוב ויצירה': { color: '#f43f5e' }, 'משחקים': { color: '#6366f1' },
         'כלים שעושים חיים קלים': { color: '#f59e0b' }, 'מאגרי מדיה': { color: '#d946ef' },
         'כלי גוגל': { color: '#8b5cf6' }, 'סימולציות': { color: '#BED4CB' }, 'default': { color: '#3b82f6' }
     };
     
+    if (!window.userChoices) window.userChoices = [];
+
+    window.toggleChoice = async function(id) {
+        const index = window.userChoices.indexOf(id);
+        if (index > -1) window.userChoices.splice(index, 1);
+        else window.userChoices.push(id);
+        
+        if (window.saveUserPreferences) await window.saveUserPreferences(window.userChoices);
+        if (activeCategory === 'הבחירות שלי') renderPresentations();
+    };
+
     window.openCategoryModal = function() { document.getElementById('categoryModalOverlay').style.display = 'flex'; }
     window.closeCategoryModal = function() { document.getElementById('categoryModalOverlay').style.display = 'none'; }
     
@@ -108,17 +124,29 @@ function initDashboard() {
 
     function renderPresentations() {
         if (!grid) return;
-        let filtered = activeCategory ? presentations.filter(p => p.category === activeCategory) : presentations;
+        
+        let filtered;
+        if (activeCategory === 'הבחירות שלי') {
+            filtered = presentations.filter(p => window.userChoices.includes(p.id));
+        } else {
+            filtered = activeCategory ? presentations.filter(p => p.category === activeCategory) : presentations;
+        }
+
         if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery));
         
         if (filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-500 font-bold">לא נמצאו כלים...</div>`; return; }
 
         grid.innerHTML = filtered.map(p => {
+            const isChecked = window.userChoices.includes(p.id) ? 'checked' : '';
             const style = categoryStyles[p.category] || categoryStyles['default'];
             const finalCenter = hexToRgba(style.color, 0.9);
             const finalEdge = hexToRgba(style.color, 0.45);
             return `
             <div class="card-3d p-8 flex flex-col justify-between" style="--category-color: ${style.color}; --card-gradient-center: ${finalCenter}; --card-gradient-edge: ${finalEdge};">
+                <div class="choice-checkbox-container" title="שמור בבחירות שלי">
+                    <input type="checkbox" class="choice-checkbox" onchange="toggleChoice(${p.id})" ${isChecked}>
+                    <span class="selected-check">✔️</span>
+                </div>
                 <div>
                     <div class="category-chip" style="border-right-color: ${style.color}">
                         <span class="category-num-badge" style="background: ${style.color}">${categoryMap[p.category] || 0}</span>
@@ -150,3 +178,5 @@ function initDashboard() {
     renderPresentations();
 }
 window.initDashboard = initDashboard;
+
+```
