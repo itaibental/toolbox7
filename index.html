@@ -1,4 +1,5 @@
 
+```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -12,15 +13,14 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Login View -->
     <div id="login-view">
         <div class="login-card">
             <h1 class="text-3xl font-bold mb-2 text-white uppercase italic tracking-wider">שחקים TOOLBOX</h1>
             <p class="text-slate-400 mb-8">זיהוי משתמש ארגוני</p>
-            <div id="errorMessage" class="error-box text-right"></div>
+            <div id="errorMessage" class="error-box text-right" style="display: none; color: #f87171; margin-bottom: 1rem;">תעודת הזהות לא קיימת במערכת.</div>
             <div class="input-group">
                 <label class="input-label">תעודת זהות</label>
-                <input type="text" id="idInput" class="main-input">
+                <input type="text" id="idInput" class="main-input" placeholder="הכנס ת.ז.">
             </div>
             <button id="submitBtn" class="enter-btn">כניסה למערכת</button>
             <div class="mt-8 pt-6 border-t border-white/10 flex gap-2 justify-center items-center">
@@ -30,7 +30,7 @@
         </div>
     </div>
     
-    <div id="welcomeOverlay">
+    <div id="welcomeOverlay" style="display: none;">
         <h2 id="welcomeName" class="text-4xl font-bold text-white mb-4 text-center">שלום</h2>
         <p class="text-orange-400 text-xl mb-8">מיד תועבר לארגז הכלים...</p>
         <div class="spinner"></div>
@@ -54,14 +54,12 @@
 
         <button id="mobileCategoryTrigger" onclick="openCategoryModal()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-            <span id="currentMobileCategory">כל הקטגורוריות</span>
+            <span id="currentMobileCategory">כל הקטגוריות</span>
         </button>
 
         <div id="presentationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mt-4">
-            <!-- Presentation cards will be injected here -->
-        </div>
+            </div>
 
-        <!-- Info Modal -->
         <div id="infoModal" class="modal-overlay" onclick="closeModal()">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <h2 id="modalTitle" class="text-3xl font-bold mb-4 text-center futuristic-title" style="border: none;"></h2>
@@ -70,7 +68,6 @@
             </div>
         </div>
 
-        <!-- Category Modal (for mobile) -->
         <div id="categoryModalOverlay" onclick="closeCategoryModal()">
             <div class="category-modal-content" onclick="event.stopPropagation()">
                 <h2 class="text-2xl text-center font-bold mb-4">בחר קטגוריה</h2>
@@ -85,7 +82,6 @@
         </footer>
     </div>
 
-    <!-- Admin/User Management View -->
     <div id="admin-management-view" style="display: none;" class="max-w-6xl mx-auto p-4 md:p-8">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl md:text-5xl font-bold futuristic-title">ממשק ניהול</h1>
@@ -115,7 +111,7 @@
                  <h2 class="text-2xl font-bold mb-4 mt-8 text-orange-400">ייבוא מ-Google Sheets</h2>
                 <div class="bg-slate-800 p-6 rounded-lg">
                     <div class="input-group">
-                        <label class="input-label">הדבק כתובת URL של Google Sheet</label>
+                        <label class="input-label">כתובת URL של Google Sheet</label>
                         <input type="text" id="googleSheetUrl" class="main-input" placeholder="https://docs.google.com/spreadsheets/d/...">
                          <p class="text-xs text-slate-400 mt-2">ודא שהגיליון משותף במצב 'כל מי שיש לו את הקישור יכול להציג'</p>
                     </div>
@@ -131,20 +127,20 @@
                                 <th class="p-2">שם פרטי</th>
                                 <th class="p-2">שם משפחה</th>
                                 <th class="p-2">תעודת זהות</th>
-                                <th class="p-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></th>
+                                <th class="p-2">פעולות</th>
                             </tr>
                         </thead>
                         <tbody id="userListBody">
-                            <!-- Rows will be injected by JS -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main App Logic -->
     <script src="auth.js" type="module"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>
+
+```
