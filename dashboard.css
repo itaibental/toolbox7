@@ -1,35 +1,4 @@
-
-.choice-checkbox-container {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 10;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 5px;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s;
-}
- 
-.choice-checkbox {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #10b981;
-}
-
-.selected-check {
-    color: #10b981;
-    font-weight: bold;
-    margin-right: 4px;
-    display: none;
-    font-size: 14px;
-}
-
-input:checked + .selected-check {
-    display: inline;
-}:root {
+:root {
     --bg-deep: #020617;
     --accent-blue: #3b82f6; 
     --accent-light: #93c5fd; 
@@ -146,7 +115,7 @@ body.force-mobile-view #presentationsGrid { grid-template-columns: 1fr !importan
 footer { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.05); background: rgba(0, 0, 0, 0.3); }
 body.light-blue-mode footer { background: #bae6fd; border-top-color: #7dd3fc; }
 
-/* סגנונות חדשים עבור תיבות הבחירה בכרטיס */
+/* סגנונות עבור תיבות הבחירה בכרטיס */
 .choice-checkbox-container {
     position: absolute;
     top: 15px;
@@ -168,7 +137,7 @@ body.light-blue-mode footer { background: #bae6fd; border-top-color: #7dd3fc; }
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #10b981; /* צבע ירוק מבוקש */
+    accent-color: #10b981;
 }
 
 .selected-check {
@@ -179,6 +148,7 @@ body.light-blue-mode footer { background: #bae6fd; border-top-color: #7dd3fc; }
     font-size: 14px;
 }
 
+/* מציג את ה-V הירוק רק כאשר ה-checkbox מסומן */
 input:checked + .selected-check {
     display: inline;
 }
