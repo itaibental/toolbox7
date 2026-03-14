@@ -115,3 +115,32 @@
         
         footer { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.05); background: rgba(0, 0, 0, 0.3); }
         body.light-blue-mode footer { background: #bae6fd; border-top-color: #7dd3fc; }
+
+.choice-checkbox-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+}
+.choice-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #10b981;
+}
+.selected-check {
+    color: #10b981;
+    font-weight: bold;
+    margin-right: 4px;
+    display: none;
+    font-size: 14px;
+}
+input:checked + .selected-check {
+    display: inline;
+}
