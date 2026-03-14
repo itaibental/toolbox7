@@ -20,77 +20,55 @@ let dbUsers = [];
 let currentLoggedInUserId = null;
 
 const submitBtn = document.getElementById('submitBtn');
-const idInput = document.getElementById('idInput');
-const errorMessage = document.getElementById('errorMessage');
 const loginView = document.getElementById('login-view');
 const welcomeOverlay = document.getElementById('welcomeOverlay');
 const welcomeName = document.getElementById('welcomeName');
 const dashboardView = document.getElementById('dashboard-view');
 
-// טעינת משתמשים ועדכון הלחצן
 async function loadAndCacheUsers() {
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'טוען נתונים...';
-    }
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'טוען נתונים...';
     try {
         const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
         const usersSnapshot = await getDocs(usersRef);
         dbUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'כניסה למערכת';
-        }
-    } catch (e) {
-        console.error("Load failed", e);
-        if (submitBtn) submitBtn.innerText = 'שגיאה בטעינה';
-    }
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'כניסה למערכת';
+    } catch (e) { console.error("Load failed", e); }
 }
 
 signInAnonymously(auth).then(loadAndCacheUsers);
 
-// פונקציית שמירה לענן
 window.saveUserPreferences = async function(choices) {
     if (!currentLoggedInUserId) return;
     try {
         const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentLoggedInUserId);
         await setDoc(userDocRef, { myChoices: choices }, { merge: true });
-    } catch (e) { console.error("Save preferences failed", e); }
+    } catch (e) { console.error("Save failed", e); }
 };
 
-// לוגיקת כניסה
 async function doLogin(fName, lName, userId) {
     currentLoggedInUserId = userId;
-    if (welcomeName) welcomeName.innerText = `שלום ${fName}`;
-    if (welcomeOverlay) welcomeOverlay.style.display = 'flex';
+    welcomeName.innerText = `שלום ${fName}`;
+    welcomeOverlay.style.display = 'flex';
 
     try {
         const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
         const userDoc = await getDoc(userDocRef);
         window.userChoices = (userDoc.exists() && userDoc.data().myChoices) ? userDoc.data().myChoices : [];
-    } catch (e) { 
-        window.userChoices = []; 
-    }
+    } catch (e) { window.userChoices = []; }
 
     setTimeout(() => {
-        if (welcomeOverlay) welcomeOverlay.style.display = 'none';
-        if (loginView) loginView.style.display = 'none';
-        if (dashboardView) dashboardView.style.display = 'block';
+        welcomeOverlay.style.display = 'none';
+        loginView.style.display = 'none';
+        dashboardView.style.display = 'block';
         if (window.initDashboard) window.initDashboard();
     }, 1500);
 }
 
-// האזנה לקליק
-if (submitBtn) {
-    submitBtn.addEventListener('click', () => {
-        const id = idInput ? idInput.value.trim() : "";
-        if (!id) return;
-
-        const user = dbUsers.find(u => u.id === id);
-        if (user) {
-            doLogin(user.firstName, user.lastName, user.id);
-        } else {
-            if (errorMessage) errorMessage.style.display = 'block';
-        }
-    });
-}
+submitBtn.addEventListener('click', () => {
+    const id = document.getElementById('idInput').value.trim();
+    const user = dbUsers.find(u => u.id === id);
+    if (user) doLogin(user.firstName, user.lastName, user.id);
+    else document.getElementById('errorMessage').style.display = 'block';
+});
