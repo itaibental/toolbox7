@@ -79,9 +79,19 @@ function showError(msg) {
     submitBtn.disabled = false;
 }
 
-async function doLogin(fName, lName) {
+async function doLogin(fName, lName, userId) {
+    currentLoggedInUserId = userId;
     welcomeName.innerText = `שלום ${fName}`;
     welcomeOverlay.style.display = 'flex';
+
+    try {
+        const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+        // טעינת הבחירות למשתנה גלובלי ש-dashboard.js יוכל לקרוא
+        window.userChoices = (userDoc.exists() && userDoc.data().myChoices) ? userDoc.data().myChoices : [];
+    } catch (e) {
+        window.userChoices = [];
+    }
 
     setTimeout(() => {
         welcomeOverlay.style.display = 'none';
@@ -209,7 +219,14 @@ async function saveStagedUsers() {
         // The button state is now managed by loadUserListFromDB and the staging functions
     }
 }
-
+window.saveUserPreferences = async function(choices) {
+    if (!currentLoggedInUserId) return;
+    try {
+        const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentLoggedInUserId);
+        // merge: true מבטיח ששדות אחרים כמו שם לא יימחקו
+        await setDoc(userDocRef, { myChoices: choices }, { merge: true });
+    } catch (e) { console.error("Error saving choices", e); }
+};
 goToSiteBtn.addEventListener('click', showDashboard);
 
 addUserBtn.addEventListener('click', () => {
@@ -315,8 +332,8 @@ submitBtn.addEventListener('click', () => {
     submitBtn.disabled = true;
 
     const user = dbUsers.find(u => u.id === id);
-    if (user) {
-        doLogin(user.firstName, user.lastName);
+    if (user)
+    doLogin(user.firstName, user.lastName, user.id);
     } else {
         showError("תעודת הזהות לא קיימת במערכת.");
         submitBtn.disabled = false;
