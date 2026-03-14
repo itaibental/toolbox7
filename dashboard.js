@@ -2,7 +2,7 @@ function initDashboard() {
     const categoryMap = {
         'הבחירות שלי': 0, 'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
         'כלים שעושים חיים קלים': 5, 'מאגרי מדיה': 6, 'כלי גוגל': 7, 'סימולציות': 8
-    }; 
+    };
 
     const categoryStyles = {
         'הבחירות שלי': { color: '#10b981' },
@@ -51,13 +51,14 @@ const presentations = [
     ];
 const grid = document.getElementById('presentationsGrid');
     const desktopFilterBar = document.getElementById('desktopFilterBar');
+    const myChoicesContainer = document.getElementById('myChoicesContainer');
     const themeToggleBtn = document.getElementById('theme-toggle');
     const mobileCategoryLabel = document.getElementById('currentMobileCategory');
 
     let activeCategory = null;
     let searchQuery = '';
 
-    // Theme Logic
+    // לוגיקת החלפת ערכת נושא
     const applyTheme = (theme) => {
         if (theme === 'light') {
             document.body.classList.add('light-blue-mode');
@@ -78,7 +79,7 @@ const grid = document.getElementById('presentationsGrid');
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) applyTheme(savedTheme);
 
-    // Color Helper
+    // פונקציית עזר לחישוב שקיפות צבעים
     function hexToRgba(hex, opacity) { 
         let r = 0, g = 0, b = 0; 
         if (hex.length == 4) { r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; } 
@@ -111,11 +112,24 @@ const grid = document.getElementById('presentationsGrid');
 
     function renderFilters() {
         const categories = Object.keys(categoryMap);
-        desktopFilterBar.innerHTML = categories.map(cat => `
+        const myChoicesCat = 'הבחירות שלי';
+        const otherCategories = categories.filter(cat => cat !== myChoicesCat);
+
+        // רינדור "הבחירות שלי" לשורה נפרדת
+        myChoicesContainer.innerHTML = `
+            <button onclick="setFilter('${myChoicesCat}')" class="filter-btn ${activeCategory === myChoicesCat ? 'active-filter' : ''}">
+                <span class="category-num-badge" style="background: ${categoryStyles[myChoicesCat].color}">${categoryMap[myChoicesCat]}</span>
+                ${myChoicesCat}
+            </button>
+        `;
+
+        // רינדור שאר הקטגוריות לסרגל הראשי
+        desktopFilterBar.innerHTML = otherCategories.map(cat => `
             <button onclick="setFilter('${cat}')" class="filter-btn ${activeCategory === cat ? 'active-filter' : ''}">
                 <span class="category-num-badge" style="background: ${categoryStyles[cat].color}">${categoryMap[cat]}</span>
                 ${cat}
             </button>`).join('');
+        
         if (mobileCategoryLabel) mobileCategoryLabel.innerText = activeCategory || "כל הקטגוריות";
     }
 
@@ -152,8 +166,7 @@ const grid = document.getElementById('presentationsGrid');
                         <button onclick="openModal(${p.id})" class="yellow-action-btn py-2 text-xs">מידע</button>
                         <a href="${p.siteUrl}" target="_blank" class="yellow-action-btn py-2 text-xs text-center flex items-center justify-center">כניסה</a>
                     </div>
-                    ${p.guideUrl ? `<a href="${p.guideUrl}" target="_blank" class="py-2 px-4 font-bold text-center text-[10px] border border-orange-300/50 rounded" style="color: #fdba74;">מדריך חשבון חינוך</a>` : ''}
-                    ${p.driveUrl ? `<a href="${p.driveUrl}" target="_blank" class="bg-orange-600 hover:bg-orange-500 text-white py-2 text-center text-xs font-bold rounded shadow-lg">צפייה במצגת ההדרכה</a>` : ''}
+                    ${p.driveUrl ? `<a href="${p.driveUrl}" target="_blank" class="bg-orange-600 hover:bg-orange-500 text-white py-2 text-center text-xs font-bold rounded shadow-lg uppercase">צפייה במצגת ההדרכה</a>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -169,5 +182,7 @@ const grid = document.getElementById('presentationsGrid');
 
     renderFilters();
     renderPresentations();
+}
+window.initDashboard = initDashboard;();
 }
 window.initDashboard = initDashboard;
