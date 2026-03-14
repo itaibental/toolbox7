@@ -46,6 +46,8 @@
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
 
+        <div id="myChoicesContainer" class="flex justify-center mb-6"></div>
+
         <div id="desktopFilterBar"></div>
 
         <button id="mobileCategoryTrigger" onclick="openCategoryModal()">
@@ -75,36 +77,6 @@
             <p>נוצר ע"י איתי בן טל</p>
             <p>אורט שחקים נהריה</p>
         </footer>
-    </div>
-
-    <div id="admin-management-view" style="display: none;" class="max-w-6xl mx-auto p-4 md:p-8">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl md:text-5xl font-bold futuristic-title">ממשק ניהול</h1>
-            <div>
-                <button id="saveCloudBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all">שמור שינויים בענן</button>
-                <button id="goToSiteBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all">מעבר לאתר</button>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-1">
-                <h2 class="text-2xl font-bold mb-4 text-orange-400">הוספת משתמש</h2>
-                <div class="bg-slate-800 p-6 rounded-lg">
-                    <input type="text" id="newFirstName" class="main-input mb-2" placeholder="שם פרטי">
-                    <input type="text" id="newLastName" class="main-input mb-2" placeholder="שם משפחה">
-                    <input type="text" id="newId" class="main-input mb-4" placeholder="תעודת זהות">
-                    <button id="addUserBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all">הוסף משתמש</button>
-                </div>
-            </div>
-            <div class="lg:col-span-2">
-                <h2 class="text-2xl font-bold mb-4 text-orange-400">רשימת משתמשים</h2>
-                <div class="bg-slate-800 p-6 rounded-lg max-h-96 overflow-y-auto">
-                    <table class="w-full text-right">
-                        <thead><tr class="border-b border-slate-700"><th class="p-2">שם</th><th class="p-2">ת.ז.</th><th class="p-2">פעולות</th></tr></thead>
-                        <tbody id="userListBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script src="auth.js" type="module"></script>
