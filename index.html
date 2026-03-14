@@ -6,6 +6,123 @@
     <title>ארגז הכלים של שחקים</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="login-view">
+        <div class="login-card">
+            <h1 class="text-3xl font-bold mb-2 text-white uppercase italic tracking-wider">שחקים TOOLBOX</h1>
+            <p class="text-slate-400 mb-8">זיהוי משתמש ארגוני</p>
+            <div id="errorMessage" class="error-box text-right" style="display: none;">תעודת הזהות לא קיימת במערכת.</div>
+            <div class="input-group">
+                <label class="input-label">תעודת זהות</label>
+                <input type="text" id="idInput" class="main-input" placeholder="הכנס ת.ז.">
+            </div>
+            <button id="submitBtn" class="enter-btn">כניסה למערכת</button>
+            <div class="mt-8 pt-6 border-t border-white/10 flex gap-2 justify-center items-center">
+                <input type="password" id="adminCode" class="w-24 bg-slate-800 border border-white/10 rounded p-2 text-center text-sm text-white outline-none" placeholder="קוד מנהל">
+                <button id="adminBtn" class="bg-orange-600/20 hover:bg-orange-600 text-orange-400 hover:text-white px-4 py-2 rounded text-xs transition-all">כניסה</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="welcomeOverlay" style="display: none;">
+        <h2 id="welcomeName" class="text-4xl font-bold text-white mb-4 text-center">שלום</h2>
+        <p class="text-orange-400 text-xl mb-8">מיד תועבר לארגז הכלים...</p>
+        <div class="spinner"></div>
+    </div>
+
+    <div id="dashboard-view" style="display: none;">
+        <header class="text-center py-6 relative">
+            <img src="media/logo.png" alt="לוגו בית הספר" class="mx-auto h-24 mb-4">
+            <h1 class="text-3xl md:text-5xl font-bold futuristic-title">ארגז הכלים של שחקים</h1>
+            <button id="theme-toggle" title="שנה ערכת נושא" class="absolute top-4 right-4 text-2xl" onclick="toggleTheme()">☀️</button>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="חיפוש לפי שם או תיאור..." class="search-input">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+
+        <div id="desktopFilterBar"></div>
+
+        <button id="mobileCategoryTrigger" onclick="openCategoryModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <span id="currentMobileCategory">כל הקטגוריות</span>
+        </button>
+
+        <div id="presentationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mt-4"></div>
+
+        <div id="infoModal" class="modal-overlay" onclick="closeModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <h2 id="modalTitle" class="text-3xl font-bold mb-4 text-center futuristic-title" style="border: none;"></h2>
+                <p id="modalBody" class="text-base md:text-lg leading-relaxed whitespace-pre-wrap"></p>
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl font-bold">&times;</button>
+            </div>
+        </div>
+
+        <div id="categoryModalOverlay" onclick="closeCategoryModal()">
+            <div class="category-modal-content" onclick="event.stopPropagation()">
+                <h2 class="text-2xl text-center font-bold mb-4">בחר קטגוריה</h2>
+                <div id="mobileModalList"></div>
+                 <button onclick="closeCategoryModal()" class="mt-4 w-full bg-red-500/20 text-red-400 py-3 rounded-lg">סגור</button>
+            </div>
+        </div>
+        
+        <footer class="text-center py-6 text-sm text-slate-400">
+            <p>נוצר ע"י איתי בן טל</p>
+            <p>אורט שחקים נהריה</p>
+        </footer>
+    </div>
+
+    <div id="admin-management-view" style="display: none;" class="max-w-6xl mx-auto p-4 md:p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl md:text-5xl font-bold futuristic-title">ממשק ניהול</h1>
+            <div>
+                <button id="saveCloudBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all">שמור שינויים בענן</button>
+                <button id="goToSiteBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all">מעבר לאתר</button>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+                <h2 class="text-2xl font-bold mb-4 text-orange-400">הוספת משתמש ידנית</h2>
+                <div class="bg-slate-800 p-6 rounded-lg">
+                    <input type="text" id="newFirstName" class="main-input mb-2" placeholder="שם פרטי">
+                    <input type="text" id="newLastName" class="main-input mb-2" placeholder="שם משפחה">
+                    <input type="text" id="newId" class="main-input mb-4" placeholder="תעודת זהות">
+                    <button id="addUserBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all">הוסף משתמש</button>
+                </div>
+                 <h2 class="text-2xl font-bold mb-4 mt-8 text-orange-400">ייבוא מ-Google Sheets</h2>
+                <div class="bg-slate-800 p-6 rounded-lg">
+                    <input type="text" id="googleSheetUrl" class="main-input mb-4" placeholder="קישור לגיליון גוגל">
+                    <button id="importSheetBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all">טען נתונים</button>
+                </div>
+            </div>
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold mb-4 text-orange-400">רשימת משתמשים</h2>
+                <div class="bg-slate-800 p-6 rounded-lg max-h-96 overflow-y-auto">
+                    <table class="w-full text-right">
+                        <thead><tr class="border-b border-slate-700"><th class="p-2">שם</th><th class="p-2">ת.ז.</th><th class="p-2">פעולות</th></tr></thead>
+                        <tbody id="userListBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js" type="module"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ארגז הכלים של שחקים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="style.css">
 </head>
