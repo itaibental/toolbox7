@@ -76,7 +76,7 @@ const grid = document.getElementById('presentationsGrid');
     };
 
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) applyTheme(savedTheme);
+    applyTheme(savedTheme === 'light' ? 'light' : 'dark');
 
     function hexToRgba(hex, opacity) { 
         let r = 0, g = 0, b = 0; 
@@ -158,7 +158,6 @@ const grid = document.getElementById('presentationsGrid');
                  style="--category-color: ${style.color}; --card-gradient-center: ${finalCenter}; --card-gradient-edge: ${finalEdge}; --category-glow: ${style.color}40;">
                 <div class="choice-checkbox-container">
                     <input type="checkbox" class="choice-checkbox" onchange="toggleChoice(${p.id})" ${isChecked}>
-                    <span class="selected-check">✔️</span>
                 </div>
                 <div>
                     <div class="category-chip" style="border-right-color: ${style.color}">
