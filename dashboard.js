@@ -12,6 +12,33 @@ function initDashboard() {
         'כלי גוגל': { color: '#8b5cf6' }, 'סימולציות': { color: '#BED4CB' }, 
         'default': { color: '#3b82f6' }
     };
+
+    const themeToggleBtn = document.getElementById('theme-toggle');
+
+    const applyTheme = (theme) => {
+        if (theme === 'light') {
+            document.body.classList.add('light-blue-mode');
+            if (themeToggleBtn) themeToggleBtn.innerText = '🌙';
+        } else {
+            document.body.classList.remove('light-blue-mode');
+            if (themeToggleBtn) themeToggleBtn.innerText = '☀️';
+        }
+    };
+
+    window.toggleTheme = () => {
+        const isLight = document.body.classList.contains('light-blue-mode');
+        const newTheme = isLight ? 'dark' : 'light';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    };
+
+    // טעינת הגדרת המשתמש מהדפדפן
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) { 
+        applyTheme(savedTheme); 
+    } else { 
+        applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); 
+    }
     const presentations = [
         { id: 1, title: "Padlet", category: "שיתופיות", driveUrl: "https://drive.google.com/file/d/1EJkXEIy4E1De2FD1pdPY8Ux9jPEQIHe5/view?usp=sharing", siteUrl: "https://padlet.com", description: "לוח קיר דיגיטלי לריכוז רעיונות ותוצרים ויזואליים בזמן אמת.", info: "• ניהול סיעור מוחות כיתתי: כולם כותבים בו-זמנית על קיר אחד משותף.\n• איסוף תוצרי למידה: ריכוז תמונות, קבצים, קישורים וסרטונים שיצרו התלמידים במקום אחד.\n• הערכת עמיתים (Peer Assessment): התלמידים יכולים להגיב זה לזה, לסמן 'לייק' ולדרג עבודות." },
         { id: 2, title: "ThingLink", category: "אינטראקטיביות", driveUrl: "https://drive.google.com/file/d/1_TS0ZEg3vJW2uPbbnO12vneIdTavgLz6/view?usp=sharing", siteUrl: "https://www.thinglink.com", description: "הפוך כל תמונה למפת למידה אינטראקטיבית עם נקודות מידע.", info: "• העשרת תמונות: הוספת נקודות חמות (Hotspots) הכוללות טקסט, אודיו, וידאו וקישורים.\n• סיורים וירטואליים: יצירת חווית למידה סוחפת באמצעות תמונות 360 מעלות." },
@@ -76,7 +103,15 @@ const grid = document.getElementById('presentationsGrid');
                 ${cat}
             </button>`).join('');
     }
-
+function hexToRgba(hex, opacity) { 
+        let r = 0, g = 0, b = 0; 
+        if (hex.length == 4) { 
+            r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; 
+        } else if (hex.length == 7) { 
+            r = "0x" + hex[1] + hex[2]; g = "0x" + hex[3] + hex[4]; b = "0x" + hex[5] + hex[6]; 
+        } 
+        return `rgba(${+r}, ${+g}, ${+b}, ${opacity})`; 
+    }
     function renderPresentations() {
         if (!grid) return;
         let filtered = activeCategory === 'הבחירות שלי' ? presentations.filter(p => window.userChoices.includes(String(p.id))) : 
@@ -84,7 +119,7 @@ const grid = document.getElementById('presentationsGrid');
         
         if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery));
         
-        grid.innerHTML = filtered.map(p => {
+             grid.innerHTML = filtered.map(p => {
             const style = categoryStyles[p.category] || categoryStyles['default'];
             const isChecked = window.userChoices.includes(String(p.id)) ? 'checked' : '';
             return `
