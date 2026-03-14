@@ -1,8 +1,9 @@
 function initDashboard() {
-    const categoryMap = {
-        'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
-        'כלים שעושים חיים קלים': 5, 'מאגרי מדיה': 6, 'כלי גוגל': 7
-    };
+ const categoryMap = {
+    'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
+    'כלים שעושים חיים קלים': 5, 'מאגרי מדיה': 6, 'כלי גוגל': 7,
+    'סימולציות': 8
+};
 
     const presentations = [
         { id: 1, title: "Padlet", category: "שיתופיות", driveUrl: "https://drive.google.com/file/d/1EJkXEIy4E1De2FD1pdPY8Ux9jPEQIHe5/view?usp=sharing", siteUrl: "https://padlet.com", description: "לוח קיר דיגיטלי לריכוז רעיונות ותוצרים ויזואליים בזמן אמת.", info: "• ניהול סיעור מוחות כיתתי: כולם כותבים בו-זמנית על קיר אחד משותף.\n• איסוף תוצרי למידה: ריכוז תמונות, קבצים, קישורים וסרטונים שיצרו התלמידים במקום אחד.\n• הערכת עמיתים (Peer Assessment): התלמידים יכולים להגיב זה לזה, לסמן 'לייק' ולדרג עבודות.\n• ארגון מידע במבנה גמיש: ניתן לסדר את הלוח כמפה, כציר זמן, כטורים או כקיר חופשי.\n• שימוש בפורמט 'טורים' לניהול שלבים בפרויקטים כיתתיים (K-W-L).\n• הלוח נשמר לאורך זמן וניתן להטמעה באתר הכיתה או ב-Google Classroom." },
@@ -37,6 +38,7 @@ function initDashboard() {
         { id: 30, title: "TinyWow", category: "כלים שעושים חיים קלים", driveUrl: "https://drive.google.com/file/d/1PgRcU5CiKHKVJFKgTCjT4vCDFbPPHeMW/view?usp=drive_link", siteUrl: "https://tinywow.com/", description: "מאות כלים חינמיים לטיפול בקבצים, תמונות, וידאו וכתיבה.", info: "• כלי AI: כתיבת טקסטים, שיפור ניסוחים ויצירת פסקאות שלמות בעזרת בינה מלאכותית.\n• עריכת תמונות: הסרת אלמנטים לא רצויים מתמונות (Object Removal) וטשטוש רקעים.\n• ניהול PDF: הוספת חתימה, מיזוג, פיצול והמרת טבלאות PDF ל-Excel בצורה חכמה.\n• חילוץ טקסט (OCR): הפיכת תמונות או מסמכים סרוקים לטקסט חי הניתן לעריכה.\n• אין הגבלות: מאות כלים שזמינים ללא הרשמה וללא תשלום, הכל תחת קורת גג אחת." },
         { id: 9, title: "Pixabay", category: "מאגרי מדיה", driveUrl: "https://drive.google.com/file/d/1S_HBANOnFfFrMjtJ_q7l5tf_JKqu2s1W/view?usp=sharing", siteUrl: "https://pixabay.com", description: "מאגר תמונות וסרטונים לשימוש חופשי ללא זכויות יוצרים.", info: "• מאגר ענק: גישה למיליוני תמונות, איורים, וקטורים, סרטונים ומוזיקה באיכות גבוהה מאוד.\n• זכויות יוצרים: כל המדיה בחינם לשימוש מסחרי וחינוכי (CC0), מה שמונע בעיות משפטיות.\n• חיפוש נוח: אפשרות לחיפוש בעברית ובאנגלית ומציאת מדיה לפי צבעים או גודל.\n• איכות: הורדת קבצים ברזולוציות שונות בהתאם לצורך (מצגת קלה או הדפסת פוסטר).\n• סאונד: מאגר מוזיקת רקע ואפקטים קוליים לשימוש בסרטוני הדרכה ופרויקטים של תלמידים." },
         { id: 12, title: "Unsplash", category: "מאגרי מדיה", driveUrl: "https://drive.google.com/file/d/1F-ZV_XWo3fQKpTRmCv1UAxb9kOL8HVc4/view?usp=sharing", siteUrl: "https://unsplash.com", description: "מאגר צילומי אמנותיים ואיכותיים ברזולוציה גבוהה.", info: "• צילום אמנותי: מאגר המבוסס על צלמים מקצועיים מרחבי העולם המשתפים את יצירותיהם.\n• אסתטיקה: התמונות מתאפיינות במראה 'אמנותי' ואיכותי במיוחד, מעולה למצגות השראה.\n• רקעים: תמונות בפורמט רחב המתאימות כרקעים למחשב או למצגות רחבות.\n• אוספים: אפשרות לחיפוש לפי קטגוריות נושאיות שנאצרו ע\"י עורכים (טבע, טכנולוגיה, אנשים).\n• שימוש חופשי: כל התמונות ניתנות להורדה ולשימוש ללא עלות וללא צורך במתן קרדיט (אם כי מומלץ)." }
+        { id: 43, title: "Cymath", category: "סימולציות", driveUrl: "", siteUrl: "https://www.cymath.com", description: "פתרון בעיות מתמטיות צעד אחר צעד במגוון נושאי לימוד.", info: "• פתרון משוואות: תמיכה באלגברה, חדו\"א ונושאים מתקדמים.\n• הסברים שלב אחר שלב: הצגת דרך הפתרון המלאה.\n• ממשק ידידותי: הזנת נוסחאות בקלות.\n• כלי עזר ללמידה עצמית: מאפשר לתלמידים לבדוק את עצמם.\n• זמינות: עובד היטב בדפדפן ובאפליקציה." }
     ];
 
     const grid = document.getElementById('presentationsGrid');
@@ -69,12 +71,14 @@ function initDashboard() {
     if (savedTheme) { applyTheme(savedTheme); } 
     else { applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
 
-    const categoryStyles = {
-        'שיתופיות': { color: '#22d3ee' }, 'אינטראקטיביות': { color: '#10b981' },
-        'עיצוב ויצירה': { color: '#f43f5e' }, 'משחקים': { color: '#6366f1' },
-        'כלים שעושים חיים קלים': { color: '#f59e0b' }, 'מאגרי מדיה': { color: '#d946ef' },
-        'כלי גוגל': { color: '#8b5cf6' }, 'default': { color: '#3b82f6' }
-    };
+const categoryStyles = {
+    'שיתופיות': { color: '#22d3ee' }, 'אינטראקטיביות': { color: '#10b981' },
+    'עיצוב ויצירה': { color: '#f43f5e' }, 'משחקים': { color: '#6366f1' },
+    'כלים שעושים חיים קלים': { color: '#f59e0b' }, 'מאגרי מדיה': { color: '#d946ef' },
+    'כלי גוגל': { color: '#8b5cf6' },
+    'סימולציות': { color: 'BED4CB' },
+    'default': { color: '#3b82f6' }
+};
     
     window.openCategoryModal = function() { document.getElementById('categoryModalOverlay').style.display = 'flex'; }
     window.closeCategoryModal = function() { document.getElementById('categoryModalOverlay').style.display = 'none'; }
