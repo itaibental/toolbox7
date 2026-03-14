@@ -4,7 +4,7 @@ function initDashboard() {
         'הבחירות שלי': 0, 'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
         'כלים שעושים חיים קלים': 5, 'מאגרי מדיה': 6, 'כלי גוגל': 7, 'סימולציות': 8
     };
-
+ 
     const presentations = [
         { id: 1, title: "Padlet", category: "שיתופיות", driveUrl: "https://drive.google.com/file/d/1EJkXEIy4E1De2FD1pdPY8Ux9jPEQIHe5/view?usp=sharing", siteUrl: "https://padlet.com", description: "לוח קיר דיגיטלי לריכוז רעיונות ותוצרים ויזואליים בזמן אמת.", info: "• ניהול סיעור מוחות כיתתי: כולם כותבים בו-זמנית על קיר אחד משותף.\n• איסוף תוצרי למידה: ריכוז תמונות, קבצים, קישורים וסרטונים שיצרו התלמידים במקום אחד.\n• הערכת עמיתים (Peer Assessment): התלמידים יכולים להגיב זה לזה, לסמן 'לייק' ולדרג עבודות." },
         { id: 2, title: "ThingLink", category: "אינטראקטיביות", driveUrl: "https://drive.google.com/file/d/1_TS0ZEg3vJW2uPbbnO12vneIdTavgLz6/view?usp=sharing", siteUrl: "https://www.thinglink.com", description: "הפוך כל תמונה למפת למידה אינטראקטיבית עם נקודות מידע.", info: "• העשרת תמונות: הוספת נקודות חמות (Hotspots) הכוללות טקסט, אודיו, וידאו וקישורים.\n• סיורים וירטואליים: יצירת חווית למידה סוחפת באמצעות תמונות 360 מעלות." },
