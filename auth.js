@@ -18,6 +18,7 @@ const appId = "pedagogical-tools";
 
 let dbUsers = [];
 let stagedUsers = [];
+let currentLoggedInUserId = null; // מזהה המשתמש המחובר כעת
 
 const submitBtn = document.getElementById('submitBtn');
 const adminBtn = document.getElementById('adminBtn');
@@ -72,12 +73,24 @@ signInAnonymously(auth)
         console.error("Firebase Auth Error", err);
     });
 
-
 function showError(msg) {
     errorMessage.innerText = msg;
     errorMessage.style.display = 'block';
     submitBtn.disabled = false;
 }
+
+// פונקציית שמירת העדפות לענן
+window.saveUserPreferences = async function(choices) {
+    if (!currentLoggedInUserId) return;
+    try {
+        const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentLoggedInUserId);
+        // שימוש ב-merge: true כדי לא לדרוס נתונים קיימים
+        await setDoc(userDocRef, { myChoices: choices }, { merge: true });
+        console.log("Preferences saved successfully");
+    } catch (e) {
+        console.error("Error saving preferences", e);
+    }
+};
 
 async function doLogin(fName, lName, userId) {
     currentLoggedInUserId = userId;
@@ -85,11 +98,17 @@ async function doLogin(fName, lName, userId) {
     welcomeOverlay.style.display = 'flex';
 
     try {
+        // טעינת הבחירות של המשתמש מהענן בזמן הכניסה
         const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
         const userDoc = await getDoc(userDocRef);
-        // טעינת הבחירות למשתנה גלובלי ש-dashboard.js יוכל לקרוא
-        window.userChoices = (userDoc.exists() && userDoc.data().myChoices) ? userDoc.data().myChoices : [];
+        
+        if (userDoc.exists() && userDoc.data().myChoices) {
+            window.userChoices = userDoc.data().myChoices;
+        } else {
+            window.userChoices = [];
+        }
     } catch (e) {
+        console.error("Error loading user preferences", e);
         window.userChoices = [];
     }
 
@@ -141,7 +160,6 @@ function renderUserList() {
         userListBody.appendChild(row);
     });
 
-    // Add event listeners to delete buttons
     document.querySelectorAll('.delete-user-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const userId = e.currentTarget.dataset.id;
@@ -156,16 +174,11 @@ async function deleteUser(userId) {
     }
 
     try {
-        // Delete from Firestore
         const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
         await deleteDoc(userDocRef);
-
-        // Remove from local array and re-render
         dbUsers = dbUsers.filter(user => user.id !== userId);
         renderUserList();
-
         alert('המשתמש נמחק בהצלחה.');
-
     } catch (error) {
         console.error("Error deleting user: ", error);
         alert('אירעה שגיאה במחיקת המשתמש.');
@@ -178,7 +191,6 @@ async function loadUserListFromDB() {
         const usersSnapshot = await getDocs(usersRef);
         dbUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         stagedUsers = [];
-        
         renderUserList();
         saveCloudBtn.style.display = 'none';
     } catch (e) {
@@ -208,25 +220,17 @@ async function saveStagedUsers() {
     try {
         await batch.commit();
         alert(`הצלחה! ${stagedUsers.length} משתמשים נשמרו או עודכנו בענן.`);
-        await loadUserListFromDB(); // This will clear stagedUsers and re-render the list
+        await loadUserListFromDB();
     } catch (error) {
         alert('שגיאה קריטית בשמירת הנתונים. לא כל הנתונים נשמרו.\nאנא רענן ונסה שוב.');
         console.error('Error committing batch to Firestore:', error);
-        saveCloudBtn.disabled = false; // Only re-enable if commit failed
+        saveCloudBtn.disabled = false;
     } finally {
         saveCloudBtn.innerText = 'שמור שינויים בענן';
         importSheetBtn.disabled = false;
-        // The button state is now managed by loadUserListFromDB and the staging functions
     }
 }
-window.saveUserPreferences = async function(choices) {
-    if (!currentLoggedInUserId) return;
-    try {
-        const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentLoggedInUserId);
-        // merge: true מבטיח ששדות אחרים כמו שם לא יימחקו
-        await setDoc(userDocRef, { myChoices: choices }, { merge: true });
-    } catch (e) { console.error("Error saving choices", e); }
-};
+
 goToSiteBtn.addEventListener('click', showDashboard);
 
 addUserBtn.addEventListener('click', () => {
@@ -242,7 +246,6 @@ addUserBtn.addEventListener('click', () => {
         }
 
         stagedUsers.push({ firstName: newFirstName, lastName: newLastName, id: newId });
-        
         document.getElementById('newFirstName').value = '';
         document.getElementById('newLastName').value = '';
         document.getElementById('newId').value = '';
@@ -273,10 +276,8 @@ importSheetBtn.addEventListener('click', async () => {
         const response = await fetch(csvUrl);
         if (!response.ok) throw new Error('Network response was not ok.');
         const csvText = await response.text();
-        
         const rows = csvText.split('\n').slice(1);
         const sheetUsers = [];
-        let invalidRowCount = 0;
         let duplicateCount = 0;
 
         rows.forEach(row => {
@@ -288,36 +289,22 @@ importSheetBtn.addEventListener('click', async () => {
                     id: columns[2]
                 };
                 const isDuplicate = dbUsers.some(u => u.id === newUser.id) || stagedUsers.some(u => u.id === newUser.id) || sheetUsers.some(u => u.id === newUser.id);
-                if(isDuplicate) {
-                    duplicateCount++;
-                } else {
-                    sheetUsers.push(newUser);
-                }
-            } else if (row.trim() !== '') {
-                invalidRowCount++;
+                if(isDuplicate) duplicateCount++;
+                else sheetUsers.push(newUser);
             }
         });
         
         if (sheetUsers.length > 0) {
             stagedUsers.push(...sheetUsers);
             renderUserList();
-            
-            let alertMessage = `טעינה הושלמה: ${sheetUsers.length} משתמשים חדשים נקלטו מהגיליון ונוספו לרשימת ההמתנה לעדכון.`;
-            if (duplicateCount > 0) alertMessage += `\n${duplicateCount} כפילויות זוהו ולא נוספו.`;
-            if (invalidRowCount > 0) alertMessage += `\n${invalidRowCount} שורות לא תקינות זוהו.`;
-            alertMessage += "\nמתחיל שמירה אוטומטית בענן...";
-            alert(alertMessage);
-            
+            alert(`טעינה הושלמה: ${sheetUsers.length} משתמשים חדשים נקלטו.\nמתחיל שמירה אוטומטית בענן...`);
             await saveStagedUsers();
-
         } else {
-            let alertMessage = 'לא נמצאו משתמשים חדשים להוספה מהגיליון.';
-            if (duplicateCount > 0) alertMessage += `\nנמצאו ${duplicateCount} משתמשים שכבר קיימים במערכת או ברשימת ההמתנה.`;
-            alert(alertMessage);
+            alert('לא נמצאו משתמשים חדשים להוספה.');
         }
     } catch (error) {
-        alert('שגיאה בטעינת הגיליון. ודא שהשיתוף מוגדר כראוי ושהקישור נכון.');
-        console.error('Error fetching or parsing sheet:', error);
+        alert('שגיאה בטעינת הגיליון.');
+        console.error('Error fetching sheet:', error);
     } finally {
         importSheetBtn.disabled = false;
         importSheetBtn.innerText = 'טען נתונים מגיליון';
@@ -332,8 +319,8 @@ submitBtn.addEventListener('click', () => {
     submitBtn.disabled = true;
 
     const user = dbUsers.find(u => u.id === id);
-    if (user)
-    doLogin(user.firstName, user.lastName, user.id);
+    if (user) {
+        doLogin(user.firstName, user.lastName, user.id); // העברת ה-userId לפונקציית הכניסה
     } else {
         showError("תעודת הזהות לא קיימת במערכת.");
         submitBtn.disabled = false;
@@ -342,14 +329,10 @@ submitBtn.addEventListener('click', () => {
 
 adminBtn.addEventListener('click', () => {
     const code = document.getElementById('adminCode').value;
-    if (code === '1234') {
-        showAdminPanel();
-    } else {
-        alert("קוד שגוי");
-    }
+    if (code === '1234') showAdminPanel();
+    else alert("קוד שגוי");
 });
 
-// Initialize dashboard if the view is already visible (e.g. after a page refresh)
 if (dashboardView.style.display === 'block') {
     initDashboard();
 }
