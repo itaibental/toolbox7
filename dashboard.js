@@ -1,5 +1,4 @@
 function initDashboard() {
-    // מפת קטגוריות כולל "הבחירות שלי" ו"סימולציות"
     const categoryMap = {
         'הבחירות שלי': 0, 'שיתופיות': 1, 'אינטראקטיביות': 2, 'עיצוב ויצירה': 3, 'משחקים': 4,
         'כלים שעושים חיים קלים': 5, 'מאגרי מדיה': 6, 'כלי גוגל': 7, 'סימולציות': 8
@@ -43,37 +42,14 @@ function initDashboard() {
         { id: 45, title: "סימולטור Physics", category: "סימולציות", driveUrl: "https://drive.google.com/file/d/1JdUbGhrJBrRMtjgsJAvmnFM7eIGppJXs/view?usp=sharing", siteUrl: "https://interactives.ck12.org/simulations/physics.html", description: "מגוון רחב של סימולציות פיזיקליות הממחישות חוקים מהעולם האמיתי.", info: "• ניסוי וטעייה: שינוי פרמטרים כמו מסה וכוח.\n• המחשת חוקים: צפייה בגרפים תוך כדי תנועה." }
     ];
 
-    const grid = document.getElementById('presentationsGrid');
+   const grid = document.getElementById('presentationsGrid');
     const desktopFilterBar = document.getElementById('desktopFilterBar');
     const mobileModalList = document.getElementById('mobileModalList');
-    const mobileCategoryLabel = document.getElementById('currentMobileCategory');
     const themeToggleBtn = document.getElementById('theme-toggle');
 
     let activeCategory = null; 
     let searchQuery = '';
 
-    const applyTheme = (theme) => {
-        if (theme === 'light') {
-            document.body.classList.add('light-blue-mode');
-            if (themeToggleBtn) themeToggleBtn.innerText = '🌙';
-        } else {
-            document.body.classList.remove('light-blue-mode');
-            if (themeToggleBtn) themeToggleBtn.innerText = '☀️';
-        }
-    };
-
-    window.toggleTheme = () => {
-        const isLight = document.body.classList.contains('light-blue-mode');
-        const newTheme = isLight ? 'dark' : 'light';
-        localStorage.setItem('theme', newTheme);
-        applyTheme(newTheme);
-    };
-
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) { applyTheme(savedTheme); } 
-    else { applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
-
-    // צבעים כולל הבחירות שלי וסימולציות
     const categoryStyles = {
         'הבחירות שלי': { color: '#10b981' },
         'שיתופיות': { color: '#22d3ee' }, 'אינטראקטיביות': { color: '#10b981' },
@@ -84,7 +60,7 @@ function initDashboard() {
     
     if (!window.userChoices) window.userChoices = [];
 
-    // לוגיקת ה-Checkbox והשמירה לענן
+    // פונקציית בחירת כלי
     window.toggleChoice = async function(id) {
         const index = window.userChoices.indexOf(id);
         if (index > -1) window.userChoices.splice(index, 1);
@@ -94,13 +70,8 @@ function initDashboard() {
         if (activeCategory === 'הבחירות שלי') renderPresentations();
     };
 
-    window.openCategoryModal = function() { document.getElementById('categoryModalOverlay').style.display = 'flex'; }
-    window.closeCategoryModal = function() { document.getElementById('categoryModalOverlay').style.display = 'none'; }
-    
     function hexToRgba(hex, opacity) { 
-        let r = 0, g = 0, b = 0; 
-        if (hex.length == 4) { r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; } 
-        else if (hex.length == 7) { r = "0x" + hex[1] + hex[2]; g = "0x" + hex[3] + hex[4]; b = "0x" + hex[5] + hex[6]; } 
+        let r = "0x" + hex[1] + hex[2], g = "0x" + hex[3] + hex[4], b = "0x" + hex[5] + hex[6];
         return `rgba(${+r}, ${+g}, ${+b}, ${opacity})`; 
     }
 
@@ -108,17 +79,16 @@ function initDashboard() {
         const categories = Object.keys(categoryMap);
         const buttonsHtml = categories.map(cat => {
             const isActive = activeCategory === cat;
+            const style = categoryStyles[cat] || categoryStyles['default'];
             return `<button onclick="setFilter('${cat}')" class="filter-btn ${isActive ? 'active-filter' : ''}">
-                <span class="category-num-badge" style="background: ${categoryStyles[cat].color}">${categoryMap[cat]}</span>
+                <span class="category-num-badge" style="background: ${style.color}">${categoryMap[cat]}</span>
                 ${cat}
             </button>`;
         }).join('');
         if (desktopFilterBar) desktopFilterBar.innerHTML = buttonsHtml;
-        if (mobileModalList) mobileModalList.innerHTML = `<button onclick="setFilter(null)" class="filter-btn w-full mb-2">כל הכלים</button>` + buttonsHtml;
-        if (mobileCategoryLabel) mobileCategoryLabel.innerText = activeCategory || "כל הקטגוריות";
     }
 
-    window.setFilter = function(category) { activeCategory = category; closeCategoryModal(); renderFilters(); renderPresentations(); }
+    window.setFilter = function(category) { activeCategory = category; renderFilters(); renderPresentations(); }
     window.handleSearch = function() { searchQuery = document.getElementById('searchInput').value.toLowerCase(); renderPresentations(); }
 
     function renderPresentations() {
@@ -133,7 +103,10 @@ function initDashboard() {
 
         if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery));
         
-        if (filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-500 font-bold">לא נמצאו כלים...</div>`; return; }
+        if (filtered.length === 0) { 
+            grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-500 font-bold">לא נמצאו כלים...</div>`; 
+            return; 
+        }
 
         grid.innerHTML = filtered.map(p => {
             const isChecked = window.userChoices.includes(p.id) ? 'checked' : '';
@@ -156,11 +129,10 @@ function initDashboard() {
                 </div>
                 <div class="flex flex-col gap-4">
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="openModal(${p.id})" class="yellow-action-btn py-3 px-2 text-xs font-bold">מידע ושימושים</button>
-                        <a href="${p.siteUrl}" target="_blank" class="yellow-action-btn py-3 px-2 text-xs font-bold text-center flex items-center justify-center">כניסה לאתר</a>
+                        <button onclick="openModal(${p.id})" class="yellow-action-btn py-3 px-2 text-xs font-bold">מידע</button>
+                        <a href="${p.siteUrl}" target="_blank" class="yellow-action-btn py-3 px-2 text-xs font-bold text-center flex items-center justify-center">כניסה</a>
                     </div>
-                    ${p.guideUrl ? `<a href="${p.guideUrl}" target="_blank" class="py-3 px-4 font-bold text-center text-xs tracking-wider border border-orange-300/50 transition-all rounded" style="color: var(--light-orange); border-color: var(--light-orange);">מדריך חשבון חינוך</a>` : ''}
-                    ${p.driveUrl ? `<a href="${p.driveUrl}" target="_blank" class="bg-orange-600 hover:bg-orange-500 text-white py-3 px-4 text-center text-xs font-bold rounded shadow-lg uppercase">צפייה במצגת ההדרכה</a>` : ''}
+                    ${p.driveUrl ? `<a href="${p.driveUrl}" target="_blank" class="bg-orange-600 hover:bg-orange-500 text-white py-3 px-4 text-center text-xs font-bold rounded">מצגת הדרכה</a>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -173,6 +145,7 @@ function initDashboard() {
         document.getElementById('infoModal').style.display = 'flex'; 
     }
     window.closeModal = function() { document.getElementById('infoModal').style.display = 'none'; }
+    
     renderFilters();
     renderPresentations();
 }
