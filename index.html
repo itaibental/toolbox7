@@ -11,11 +11,12 @@
 </head>
 <body class="p-4 md:p-8">
 
+    <!-- Login View -->
     <div id="login-view">
         <div class="login-card">
             <h1 class="text-3xl font-bold mb-2 text-white uppercase italic tracking-wider">שחקים TOOLBOX</h1>
             <p class="text-slate-400 mb-8">זיהוי משתמש ארגוני</p>
-            <div id="errorMessage" class="error-box text-right" style="display: none;">תעודת הזהות לא קיימת במערכת.</div>
+            <div id="errorMessage" class="error-box text-right" style="display: none;"></div>
             <div class="input-group">
                 <label class="input-label">תעודת זהות</label>
                 <input type="text" id="idInput" class="main-input" placeholder="הכנס ת.ז.">
@@ -37,7 +38,9 @@
     <div id="dashboard-view" style="display: none;">
         <header class="text-center py-6 relative">
             <img src="media/logo.png" alt="לוגו בית הספר" class="mx-auto h-24 mb-4">
-            <h1 class="text-3xl md:text-5xl font-bold futuristic-title">ארגז הכלים של שחקים</h1>
+            <h1 class="text-3xl md:text-5xl font-bold futuristic-title">
+                ארגז הכלים של שחקים
+            </h1>
             <button id="theme-toggle" title="שנה ערכת נושא" class="absolute top-4 right-4 text-2xl" onclick="toggleTheme()">☀️</button>
         </header>
 
@@ -46,7 +49,8 @@
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
 
-        <div id="myChoicesContainer" class="flex justify-center mb-6"></div>
+        <!-- כפתור הבחירות שלי - מעל הסינון -->
+        <div id="myChoicesContainer" class="flex justify-center mb-4"></div>
 
         <div id="desktopFilterBar"></div>
 
@@ -55,8 +59,11 @@
             <span id="currentMobileCategory">כל הקטגוריות</span>
         </button>
 
-        <div id="presentationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mt-4"></div>
+        <div id="presentationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mt-4">
+            <!-- Presentation cards will be injected here -->
+        </div>
 
+        <!-- Info Modal -->
         <div id="infoModal" class="modal-overlay" onclick="closeModal()">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <h2 id="modalTitle" class="text-3xl font-bold mb-4 text-center futuristic-title" style="border: none;"></h2>
@@ -65,11 +72,12 @@
             </div>
         </div>
 
+        <!-- Category Modal (for mobile) -->
         <div id="categoryModalOverlay" onclick="closeCategoryModal()">
             <div class="category-modal-content" onclick="event.stopPropagation()">
                 <h2 class="text-2xl text-center font-bold mb-4">בחר קטגוריה</h2>
                 <div id="mobileModalList"></div>
-                 <button onclick="closeCategoryModal()" class="mt-4 w-full bg-red-500/20 text-red-400 py-3 rounded-lg">סגור</button>
+                <button onclick="closeCategoryModal()" class="mt-4 w-full bg-red-500/20 text-red-400 py-3 rounded-lg">סגור</button>
             </div>
         </div>
         
@@ -79,6 +87,67 @@
         </footer>
     </div>
 
+    <!-- Admin/User Management View -->
+    <div id="admin-management-view" style="display: none;" class="max-w-6xl mx-auto p-4 md:p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl md:text-5xl font-bold futuristic-title">ממשק ניהול</h1>
+            <div>
+                <button id="saveCloudBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all">שמור שינויים בענן</button>
+                <button id="goToSiteBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all">מעבר לאתר</button>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+                <h2 class="text-2xl font-bold mb-4 text-orange-400">הוספת משתמש ידנית</h2>
+                <div id="manualAddForm" class="bg-slate-800 p-6 rounded-lg">
+                    <div class="input-group">
+                        <label class="input-label">שם פרטי</label>
+                        <input type="text" id="newFirstName" class="main-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">שם משפחה</label>
+                        <input type="text" id="newLastName" class="main-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">תעודת זהות</label>
+                        <input type="text" id="newId" class="main-input">
+                    </div>
+                    <button id="addUserBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all">הוסף משתמש</button>
+                </div>
+                <h2 class="text-2xl font-bold mb-4 mt-8 text-orange-400">ייבוא מ-Google Sheets</h2>
+                <div class="bg-slate-800 p-6 rounded-lg">
+                    <div class="input-group">
+                        <label class="input-label">הדבק כתובת URL של Google Sheet</label>
+                        <input type="text" id="googleSheetUrl" class="main-input" placeholder="https://docs.google.com/spreadsheets/d/...">
+                        <p class="text-xs text-slate-400 mt-2">ודא שהגיליון משותף במצב 'כל מי שיש לו את הקישור יכול להציג'</p>
+                    </div>
+                    <button id="importSheetBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all">טען נתונים מגיליון</button>
+                </div>
+            </div>
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold mb-4 text-orange-400">רשימת משתמשים</h2>
+                <div class="bg-slate-800 p-6 rounded-lg max-h-96 overflow-y-auto">
+                    <table class="w-full text-right">
+                        <thead>
+                            <tr class="border-b border-slate-700">
+                                <th class="p-2">שם פרטי</th>
+                                <th class="p-2">שם משפחה</th>
+                                <th class="p-2">תעודת זהות</th>
+                                <th class="p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="userListBody">
+                            <!-- Rows will be injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Logic -->
     <script src="auth.js" type="module"></script>
     <script src="dashboard.js"></script>
 </body>
