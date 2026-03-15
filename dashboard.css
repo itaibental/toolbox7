@@ -110,8 +110,8 @@ body.force-mobile-view #presentationsGrid { grid-template-columns: 1fr !importan
 }
 .filter-btn.active-filter { box-shadow: 0 0 15px var(--accent-blue); border-color: var(--accent-blue); }
 
+/* סגנון בסיס לכפתור - הnisplay נשלט ע"י media queries בלבד */
 #mobileCategoryTrigger { 
-    display: none; 
     width: fit-content; 
     margin: 1.5rem auto 0.5rem auto; 
     background: black; 
