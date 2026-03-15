@@ -100,25 +100,9 @@ const grid = document.getElementById('presentationsGrid');
 
     window.setFilter = function(category) { 
         activeCategory = category || null; 
-        closeCategoryModal();
+        if (window.closeCategoryModal) window.closeCategoryModal();
         renderFilters(); 
         renderPresentations(); 
-    };
-
-    window.openCategoryModal = function() {
-        const overlay = document.getElementById('categoryModalOverlay');
-        if (!overlay) return;
-        overlay.style.display = 'flex';
-        // trigger reflow so animation plays
-        overlay.offsetHeight;
-        overlay.classList.add('open');
-    };
-
-    window.closeCategoryModal = function() {
-        const overlay = document.getElementById('categoryModalOverlay');
-        if (!overlay) return;
-        overlay.style.display = 'none';
-        overlay.classList.remove('open');
     };
 
     window.handleSearch = function() { 
@@ -234,3 +218,19 @@ const grid = document.getElementById('presentationsGrid');
     renderPresentations();
 }
 window.initDashboard = initDashboard;
+
+// פונקציות מודל קטגוריות - גלובליות (נקראות מ-onclick לפני initDashboard)
+window.openCategoryModal = function() {
+    const overlay = document.getElementById('categoryModalOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    overlay.offsetHeight; // reflow לאנימציה
+    overlay.classList.add('open');
+};
+
+window.closeCategoryModal = function() {
+    const overlay = document.getElementById('categoryModalOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'none';
+    overlay.classList.remove('open');
+};
