@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, setDoc, getDocs, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, setDoc, getDocs, writeBatch, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCuo4N-w-5JFu2pLwmNmPrnuB56q0-9Ikc",
@@ -328,3 +328,55 @@ adminBtn.addEventListener('click', () => {
 if (dashboardView.style.display === 'block') {
     initDashboard();
 }
+
+// ===== הצעות לכלים חדשים =====
+window.submitSuggestionToFirebase = async function(text) {
+    const suggestionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'suggestions');
+    await addDoc(suggestionsRef, {
+        text: text,
+        userId: currentLoggedInUserId || 'anonymous',
+        timestamp: serverTimestamp()
+    });
+};
+
+window.loadSuggestions = async function() {
+    const container = document.getElementById('suggestionsListAdmin');
+    if (!container) return;
+    container.innerHTML = '<p class="text-slate-400 text-sm text-center">טוען...</p>';
+    try {
+        const suggestionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'suggestions');
+        const snap = await getDocs(suggestionsRef);
+        if (snap.empty) {
+            container.innerHTML = '<p class="text-slate-400 text-sm text-center">אין הצעות עדיין.</p>';
+            return;
+        }
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+        container.innerHTML = docs.map(d => {
+            const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString('he-IL') : '';
+            return `
+            <div class="suggestion-item" id="sug-${d.id}">
+                <div class="suggestion-text">${d.text.replace(/</g,'&lt;')}</div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;">
+                    <span class="suggestion-meta">${date}<br>${d.userId !== 'anonymous' ? '👤 ' + d.userId : ''}</span>
+                    <button class="suggestion-delete-btn" onclick="deleteSuggestion('${d.id}')">מחק ✕</button>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        container.innerHTML = '<p class="text-red-400 text-sm text-center">שגיאה בטעינת ההצעות.</p>';
+        console.error(e);
+    }
+};
+
+window.deleteSuggestion = async function(id) {
+    if (!confirm('למחוק הצעה זו?')) return;
+    try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'suggestions', id);
+        await deleteDoc(docRef);
+        const el = document.getElementById('sug-' + id);
+        if (el) el.remove();
+    } catch(e) {
+        alert('שגיאה במחיקה.');
+    }
+};

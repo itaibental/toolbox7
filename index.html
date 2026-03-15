@@ -84,6 +84,43 @@
             </div>
         </div>
         
+        <!-- Suggest Tool Bar -->
+        <div class="suggest-bar">
+            <button class="suggest-bar-btn" onclick="openSuggestModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                הצע כלי חדש למאגר
+            </button>
+        </div>
+
+        <!-- Suggest Modal -->
+        <div id="suggestModalOverlay" onclick="closeSuggestModal()">
+            <div class="suggest-modal-content" onclick="event.stopPropagation()">
+                <div class="modal-drag-handle"></div>
+                <div class="suggest-modal-header">
+                    <div>
+                        <h2 class="suggest-modal-title">💡 הצע כלי חדש</h2>
+                        <p class="suggest-modal-subtitle">הצעתך תועבר ישירות למנהל המערכת</p>
+                    </div>
+                    <button class="modal-close-btn" onclick="closeSuggestModal()">✕</button>
+                </div>
+                <div class="suggest-modal-body">
+                    <div id="suggestForm">
+                        <textarea id="suggestText" class="suggest-textarea" placeholder="שם הכלי, מה הוא עושה, לאיזו קטגוריה הוא שייך...&#10;&#10;לדוגמה: Canva – כלי עיצוב גרפי קל לשימוש, מתאים לקטגוריית עיצוב ויצירה." maxlength="500"></textarea>
+                        <div class="suggest-char-count"><span id="suggestCharCount">0</span>/500</div>
+                        <button class="suggest-submit-btn" onclick="submitSuggestion()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            שלח הצעה
+                        </button>
+                    </div>
+                    <div id="suggestThanks" style="display:none;" class="suggest-thanks">
+                        <div class="suggest-thanks-icon">🎉</div>
+                        <h3>תודה שתרמת מהידע שלך למאגר!</h3>
+                        <p>ההצעה שלך התקבלה ותיבחן על ידי מנהל המערכת.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <footer class="text-center py-6 text-sm text-slate-400">
             <p>נוצר ע"י איתי בן טל</p>
             <p>אורט שחקים נהריה</p>
@@ -146,6 +183,17 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <!-- Suggestions Section -->
+        <div class="mt-10">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-orange-400">הצעות לכלים חדשים</h2>
+                <button onclick="loadSuggestions()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold py-2 px-4 rounded transition-all">רענן רשימה</button>
+            </div>
+            <div id="suggestionsListAdmin" class="bg-slate-800 p-6 rounded-lg max-h-96 overflow-y-auto">
+                <p class="text-slate-400 text-sm text-center">לחץ "רענן רשימה" לטעינת ההצעות</p>
             </div>
         </div>
     </div>
