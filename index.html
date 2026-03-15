@@ -72,12 +72,15 @@
             </div>
         </div>
 
-        <!-- Category Modal (for mobile) -->
+        <!-- Category Modal (mobile bottom sheet) -->
         <div id="categoryModalOverlay" onclick="closeCategoryModal()">
             <div class="category-modal-content" onclick="event.stopPropagation()">
-                <h2 class="text-2xl text-center font-bold mb-4">בחר קטגוריה</h2>
+                <div class="modal-drag-handle"></div>
+                <div class="modal-header">
+                    <h2>בחר קטגוריה</h2>
+                    <button class="modal-close-btn" onclick="closeCategoryModal()">✕</button>
+                </div>
                 <div id="mobileModalList"></div>
-                <button onclick="closeCategoryModal()" class="mt-4 w-full bg-red-500/20 text-red-400 py-3 rounded-lg">סגור</button>
             </div>
         </div>
         

@@ -107,12 +107,18 @@ const grid = document.getElementById('presentationsGrid');
 
     window.openCategoryModal = function() {
         const overlay = document.getElementById('categoryModalOverlay');
-        if (overlay) overlay.style.display = 'flex';
+        if (!overlay) return;
+        overlay.style.display = 'flex';
+        // trigger reflow so animation plays
+        overlay.offsetHeight;
+        overlay.classList.add('open');
     };
 
     window.closeCategoryModal = function() {
         const overlay = document.getElementById('categoryModalOverlay');
-        if (overlay) overlay.style.display = 'none';
+        if (!overlay) return;
+        overlay.style.display = 'none';
+        overlay.classList.remove('open');
     };
 
     window.handleSearch = function() { 
@@ -148,20 +154,25 @@ const grid = document.getElementById('presentationsGrid');
         // מילוי רשימת הקטגוריות במודל הסלולר
         const mobileList = document.getElementById('mobileModalList');
         if (mobileList) {
-            const allCategories = ['הכל', myChoicesCat, ...otherCategories];
-            mobileList.innerHTML = allCategories.map(cat => {
-                const isAll = cat === 'הכל';
-                const isActive = isAll ? !activeCategory : activeCategory === cat;
-                const style = categoryStyles[cat] || categoryStyles['default'];
-                const count = isAll ? presentations.length
-                    : cat === myChoicesCat ? window.userChoices.length
-                    : presentations.filter(p => p.category === cat).length;
+            const allCategories = [
+                { key: null,         label: 'כל הקטגוריות', color: '#3b82f6' },
+                { key: myChoicesCat, label: myChoicesCat,    color: categoryStyles[myChoicesCat].color },
+                ...otherCategories.map(cat => ({ key: cat, label: cat, color: (categoryStyles[cat] || categoryStyles['default']).color }))
+            ];
+            mobileList.innerHTML = allCategories.map(({ key, label, color }) => {
+                const isActive = key === null ? !activeCategory : activeCategory === key;
+                const count = key === null ? presentations.length
+                    : key === myChoicesCat ? window.userChoices.length
+                    : presentations.filter(p => p.category === key).length;
+                const onclickVal = key === null ? 'null' : `'${key}'`;
                 return `
-                <button onclick="setFilter(${isAll ? 'null' : `'${cat}'`})"
-                    class="filter-btn w-full justify-between ${isActive ? 'active-filter' : ''}"
-                    style="font-size:1rem; padding:12px 16px;">
-                    <span>${cat}</span>
-                    <span class="category-num-badge" style="background:${isAll ? '#3b82f6' : style.color}">${count}</span>
+                <button class="mobile-cat-btn ${isActive ? 'active-mobile-cat' : ''}"
+                        onclick="setFilter(${onclickVal})">
+                    <div class="mobile-cat-right">
+                        <div class="mobile-cat-dot" style="background:${color}"></div>
+                        <span>${label}</span>
+                    </div>
+                    <span class="mobile-cat-count">${count}</span>
                 </button>`;
             }).join('');
         }
