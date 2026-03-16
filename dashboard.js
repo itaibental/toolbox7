@@ -216,6 +216,10 @@ const grid = document.getElementById('presentationsGrid');
 
     renderFilters();
     renderPresentations();
+
+    // חשיפת מפת כלים לממשק מנהל (id -> title)
+    window._presentationTitles = {};
+    presentations.forEach(p => { window._presentationTitles[String(p.id)] = p.title; });
 }
 window.initDashboard = initDashboard;
 

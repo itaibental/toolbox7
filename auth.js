@@ -93,6 +93,17 @@ async function doLogin(fName, lName, userId) {
     welcomeName.innerText = `שלום ${fName}`;
     welcomeOverlay.style.display = 'flex';
 
+    // רישום כניסה ביומן
+    try {
+        const logRef = collection(db, 'artifacts', appId, 'public', 'data', 'loginLog');
+        await addDoc(logRef, {
+            userId: userId,
+            firstName: fName,
+            lastName: lName,
+            timestamp: serverTimestamp()
+        });
+    } catch(e) { console.warn('Login log failed:', e); }
+
     // טעינת בחירות שמורות של המשתמש
     try {
         const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
@@ -375,6 +386,127 @@ window.loadSuggestions = async function() {
     } catch(e) {
         container.innerHTML = '<p class="text-red-400 text-sm text-center">שגיאה בטעינת ההצעות.</p>';
         console.error(e);
+    }
+};
+
+// ===== Analytics =====
+window.loadAnalytics = async function() {
+    try {
+        // טעינת יומן כניסות
+        const logRef = collection(db, 'artifacts', appId, 'public', 'data', 'loginLog');
+        const logSnap = await getDocs(logRef);
+        const logs = logSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        logs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+        // טעינת משתמשים לבחירות
+        const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+        const usersSnap = await getDocs(usersRef);
+        const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // --- Stats ---
+        const today = new Date().toLocaleDateString('he-IL');
+        const todayLogs = logs.filter(l => l.timestamp && new Date(l.timestamp.seconds * 1000).toLocaleDateString('he-IL') === today);
+        const uniqueUsers = new Set(logs.map(l => l.userId)).size;
+        document.getElementById('statTotalLogins').innerText = logs.length;
+        document.getElementById('statUniqueUsers').innerText = uniqueUsers;
+        document.getElementById('statTodayLogins').innerText = todayLogs.length;
+
+        // --- Top Tool ---
+        const toolCount = {};
+        users.forEach(u => {
+            if (u.myChoices) u.myChoices.forEach(id => { toolCount[id] = (toolCount[id] || 0) + 1; });
+        });
+        const sortedTools = Object.entries(toolCount).sort((a, b) => b[1] - a[1]);
+        if (sortedTools.length > 0 && window._presentationTitles) {
+            document.getElementById('statTopTool').innerText = window._presentationTitles[sortedTools[0][0]] || 'id:' + sortedTools[0][0];
+        } else {
+            document.getElementById('statTopTool').innerText = sortedTools.length ? '#' + sortedTools[0][0] : '—';
+        }
+
+        // --- Top Tools List ---
+        const topList = document.getElementById('topToolsList');
+        if (sortedTools.length === 0) {
+            topList.innerHTML = '<p class="text-slate-400 text-sm text-center">אין נתונים עדיין</p>';
+        } else {
+            const max = sortedTools[0][1];
+            topList.innerHTML = sortedTools.slice(0, 10).map(([id, count], i) => {
+                const name = (window._presentationTitles && window._presentationTitles[id]) || 'כלי #' + id;
+                const pct = Math.round((count / max) * 100);
+                return `<div style="margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                        <span style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${i+1}. ${name}</span>
+                        <span style="font-size:0.8rem;color:#facc15;font-weight:800;">${count} ⭐</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;">
+                        <div style="width:${pct}%;background:#facc15;border-radius:4px;height:6px;transition:width 0.6s ease;"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- Login Log ---
+        const logList = document.getElementById('loginLogList');
+        if (logs.length === 0) {
+            logList.innerHTML = '<p class="text-slate-400 text-sm text-center">אין כניסות עדיין</p>';
+        } else {
+            logList.innerHTML = logs.slice(0, 50).map(l => {
+                const dt = l.timestamp ? new Date(l.timestamp.seconds * 1000) : null;
+                const dateStr = dt ? dt.toLocaleDateString('he-IL') : '—';
+                const timeStr = dt ? dt.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) : '';
+                return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${l.firstName || ''} ${l.lastName || ''}</span>
+                    <span style="font-size:0.75rem;color:#64748b;">${dateStr} ${timeStr}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // --- Chart: כניסות לפי ימים ---
+        const dayCounts = {};
+        const now = new Date();
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(now); d.setDate(now.getDate() - i);
+            dayCounts[d.toLocaleDateString('he-IL')] = 0;
+        }
+        logs.forEach(l => {
+            if (l.timestamp) {
+                const key = new Date(l.timestamp.seconds * 1000).toLocaleDateString('he-IL');
+                if (dayCounts[key] !== undefined) dayCounts[key]++;
+            }
+        });
+
+        const ctx = document.getElementById('loginsChart');
+        if (ctx) {
+            if (window._loginsChart) window._loginsChart.destroy();
+            window._loginsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dayCounts),
+                    datasets: [{
+                        label: 'כניסות',
+                        data: Object.values(dayCounts),
+                        backgroundColor: 'rgba(59,130,246,0.5)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { rtl: true }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b', maxRotation: 45, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#64748b', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+    } catch(e) {
+        console.error('Analytics error:', e);
+        alert('שגיאה בטעינת נתונים: ' + e.message);
     }
 };
 

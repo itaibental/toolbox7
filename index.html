@@ -186,6 +186,50 @@
             </div>
         </div>
 
+        <!-- Analytics Section -->
+        <div class="mt-10">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-orange-400">📊 אנליטיקס שימוש</h2>
+                <button onclick="loadAnalytics()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold py-2 px-4 rounded transition-all">טען נתונים</button>
+            </div>
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="statTotalLogins">—</div>
+                    <div class="admin-stat-label">סה"כ כניסות</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="statUniqueUsers">—</div>
+                    <div class="admin-stat-label">משתמשים פעילים</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="statTopTool">—</div>
+                    <div class="admin-stat-label">כלי הכי פופולרי</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="statTodayLogins">—</div>
+                    <div class="admin-stat-label">כניסות היום</div>
+                </div>
+            </div>
+            <!-- Chart -->
+            <div class="bg-slate-800 p-6 rounded-lg mb-6">
+                <h3 class="text-lg font-bold text-slate-300 mb-4">כניסות לאתר לפי ימים (30 יום אחרונים)</h3>
+                <canvas id="loginsChart" height="100"></canvas>
+            </div>
+            <!-- Top Tools -->
+            <div class="bg-slate-800 p-6 rounded-lg mb-6">
+                <h3 class="text-lg font-bold text-slate-300 mb-4">🏆 כלים פופולריים — לפי הצטרפות ל"הבחירות שלי"</h3>
+                <div id="topToolsList"></div>
+            </div>
+            <!-- Login Log -->
+            <div class="bg-slate-800 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-slate-300 mb-4">יומן כניסות אחרונות</h3>
+                <div id="loginLogList" class="max-h-72 overflow-y-auto">
+                    <p class="text-slate-400 text-sm text-center">לחץ "טען נתונים" לטעינה</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Suggestions Section -->
         <div class="mt-10">
             <div class="flex justify-between items-center mb-4">
@@ -198,6 +242,8 @@
         </div>
     </div>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- Main App Logic -->
     <script src="auth.js" type="module"></script>
     <script src="dashboard.js"></script>
