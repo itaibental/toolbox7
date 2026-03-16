@@ -217,11 +217,55 @@ const grid = document.getElementById('presentationsGrid');
     renderFilters();
     renderPresentations();
 
-    // חשיפת מפת כלים לממשק מנהל (id -> title)
-    window._presentationTitles = {};
-    presentations.forEach(p => { window._presentationTitles[String(p.id)] = p.title; });
+    // מפת כלים נבנית גלובלית בתחתית הקובץ
 }
 window.initDashboard = initDashboard;
+
+// בניית מפת כלים גלובלית — זמינה גם למנהל לפני initDashboard
+(function buildTitlesMap() {
+    window._presentationTitles = {};
+    // presentations מוגדר בתוך הפונקציה — נגיש דרך closure רק לאחר הרצה
+    // לכן נבנה את המפה פה בנפרד לצורך הממשק מנהל
+    const _titles = {
+        "1": "Padlet",
+        "2": "ThingLink",
+        "34": "Google Keep",
+        "35": "Google Tasks",
+        "36": "Google Sites",
+        "37": "Google Gemini",
+        "40": "Nano Banana",
+        "41": "Google Gems",
+        "42": "Google Earth",
+        "38": "Google Vids",
+        "39": "NotebookLM",
+        "27": "אורט קמפוס",
+        "3": "Mentimeter",
+        "4": "Canva",
+        "18": "Photopea",
+        "33": "Figma",
+        "31": "Tinkercad",
+        "6": "Genially",
+        "5": "Kahoot!",
+        "13": "Quizizz",
+        "16": "Baamboozle",
+        "17": "Nearpod",
+        "20": "Flippity",
+        "10": "Wordwall",
+        "11": "Classroomscreen",
+        "32": "Classe",
+        "7": "remove.bg",
+        "8": "iLovePDF",
+        "28": "123Apps",
+        "30": "TinyWow",
+        "9": "Pixabay",
+        "12": "Unsplash",
+        "43": "Cymath",
+        "44": "סימולטור Chemistry",
+        "45": "סימולטור Physics",
+        "46": "סימולטור קוביות תלת-מימדי"
+    };
+    window._presentationTitles = _titles;
+})();
 
 // ===== פונקציות מודל הצעת כלים =====
 window.openSuggestModal = function() {

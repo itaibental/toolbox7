@@ -417,10 +417,12 @@ window.loadAnalytics = async function() {
             if (u.myChoices) u.myChoices.forEach(id => { toolCount[id] = (toolCount[id] || 0) + 1; });
         });
         const sortedTools = Object.entries(toolCount).sort((a, b) => b[1] - a[1]);
-        if (sortedTools.length > 0 && window._presentationTitles) {
-            document.getElementById('statTopTool').innerText = window._presentationTitles[sortedTools[0][0]] || 'id:' + sortedTools[0][0];
+        if (sortedTools.length > 0) {
+            const topId = sortedTools[0][0];
+            const topTitle = (window._presentationTitles && window._presentationTitles[topId]) || topId;
+            document.getElementById('statTopTool').innerText = topTitle;
         } else {
-            document.getElementById('statTopTool').innerText = sortedTools.length ? '#' + sortedTools[0][0] : '—';
+            document.getElementById('statTopTool').innerText = '—';
         }
 
         // --- Top Tools List ---
