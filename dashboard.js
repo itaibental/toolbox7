@@ -53,7 +53,8 @@ const presentations = [
         { id: 48, title: "Chrome Music Lab", category: "משחקים", driveUrl: "", siteUrl: "https://musiclab.chromeexperiments.com/", description: "ניסויים מוזיקליים אינטראקטיביים וצבעוניים המפגישים ילדים עם עקרונות המוזיקה בצורה משחקית.", info: "• Song Maker: יצירת מנגינות ופסקול אישי בממשק גריד צבעוני פשוט וקל לשימוש.\n• Spectrogram: צפייה בצורה חזותית של הצלילים דרך המיקרופון בזמן אמת.\n• Melody Maker: חקר סולמות מוזיקליים שונים מתרבויות ברחבי העולם.\n• Rhythm: תיפוף ויצירת קצבים על מסך המגע או בעכבר בצורה אינטואיטיבית.\n• Kandinsky: ציור על המסך שהופך אוטומטית לצלילים מוזיקליים ייחודיים.\n• חינוכי ומהנה: מאפשר למורים להסביר מושגי מוזיקה כמו גובה, קצב ומנגינה דרך חוויה חזותית.\n• נגיש לכולם: ללא הרשמה, ללא עלות, ועובד בכל מכשיר עם דפדפן – כולל טאבלטים." },
         { id: 46, title: "סימולטור קוביות תלת-מימדי", category: "סימולציות", driveUrl: "", siteUrl: "https://itaibental.github.io/3dboxsimulator/", description: "בניית מבנים מקוביות וסיבוב 360° לפיתוח קריאה במרחב תלת-מימדי סיסמא לשחקים: 1234.", info: "• בניית שכבות: המורה בונה מבנה תלת-מימדי שכבה אחר שכבה, עד לגובה בלתי מוגבל.\n• סיבוב 360°: גרירת המודל לכל כיוון לצפייה מכל זווית אפשרית.\n• צביעת קומות: כל קומה ניתנת לצביעה בצבע שונה לצורך הדגשה ויזואלית והוראה ברורה.\n• קריאה במרחב: פיתוח יכולת הדמיה מרחבית – זיהוי מבנים ממבטים עליון, קדמי ונסתר.\n• הדגמה פרונטלית: כלי אידיאלי לשיעורים במתמטיקה ובגיאומטריה תלת-מימדית." }
     ];
-const grid = document.getElementById('presentationsGrid');
+window._allPresentations = presentations;
+    const grid = document.getElementById('presentationsGrid');
     const desktopFilterBar = document.getElementById('desktopFilterBar');
     const myChoicesContainer = document.getElementById('myChoicesContainer');
     const themeToggleBtn = document.getElementById('theme-toggle');

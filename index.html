@@ -273,6 +273,30 @@
                     <label class="input-label mb-2 block">תוכן — רשמו כל פריט בשורה חדשה</label>
                     <textarea id="whatsNewContent" rows="7" class="main-input" style="resize:vertical; font-family: inherit; line-height:1.7;" placeholder="• Suno — יצירת מוזיקה עם AI&#10;• Affinity Studio — עיצוב מקצועי חינמי&#10;• Chrome Music Lab — ניסויים מוזיקליים"></textarea>
                 </div>
+                <!-- Auto-fill from Firestore registry -->
+                <div class="mb-5 p-4 bg-slate-700/40 rounded-lg border border-slate-600/60">
+                    <p class="text-slate-300 text-xs font-bold mb-3 uppercase tracking-wider">🤖 כלי אוטומציה</p>
+                    <div class="flex flex-col gap-2">
+                        <!-- שלב 1: רישום כלים חדשים -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1">
+                                <p class="text-white text-sm font-bold">שלב 1 — זהה כלים חדשים</p>
+                                <p class="text-slate-400 text-xs">בדוק אילו כלים טרם נרשמו ב-Firestore ורשום אותם עם תאריך היום</p>
+                            </div>
+                            <button id="registerToolsBtn" onclick="registerNewTools()" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded transition-all whitespace-nowrap text-sm">🔍 זהה וסמן</button>
+                        </div>
+                        <p id="registerToolsStatus" class="text-xs mt-1" style="display:none;"></p>
+                        <hr class="border-slate-600/50 my-1">
+                        <!-- שלב 2: מילוי אוטומטי -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1">
+                                <p class="text-white text-sm font-bold">שלב 2 — מלא אוטומטית</p>
+                                <p class="text-slate-400 text-xs">כלים שנרשמו ב-7 הימים האחרונים יכנסו לתוכן המסך הקופץ</p>
+                            </div>
+                            <button id="autoFillBtn" onclick="autoFillWhatsNew()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded transition-all whitespace-nowrap text-sm">✨ מלא</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="flex gap-3 mt-4">
                     <button onclick="saveWhatsNew()" class="bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-6 rounded transition-all">💾 שמור תוכן</button>
                     <button onclick="previewWhatsNew()" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded transition-all">👁 תצוגה מקדימה</button>

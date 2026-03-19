@@ -645,3 +645,115 @@ window.previewWhatsNew = function() {
     if (modal) modal.style.display = 'flex';
 };
 
+
+// --- Admin: רישום כלים חדשים ב-Firestore (timestamp אוטומטי) ---
+window.registerNewTools = async function() {
+    const btn = document.getElementById('registerToolsBtn');
+    const statusEl = document.getElementById('registerToolsStatus');
+    if (btn) { btn.disabled = true; btn.innerText = 'בודק...'; }
+
+    const allTools = window._allPresentations || [];
+    if (allTools.length === 0) {
+        if (btn) { btn.disabled = false; btn.innerText = '🔍 זהה וסמן כלים חדשים'; }
+        alert('לא נמצאו כלים. ודא שה-dashboard.js נטען.');
+        return;
+    }
+
+    try {
+        // בדוק אילו כלים כבר רשומים
+        const toolsRegistryRef = collection(db, 'artifacts', appId, 'public', 'data', 'toolsRegistry');
+        const snap = await getDocs(toolsRegistryRef);
+        const registered = new Set(snap.docs.map(d => d.id));
+
+        // רשום את החדשים
+        const newTools = allTools.filter(p => !registered.has(String(p.id)));
+        if (newTools.length === 0) {
+            if (statusEl) {
+                statusEl.innerText = 'כל הכלים כבר רשומים — אין חדשים.';
+                statusEl.style.color = '#94a3b8';
+                statusEl.style.display = 'block';
+                setTimeout(() => statusEl.style.display = 'none', 4000);
+            }
+            if (btn) { btn.disabled = false; btn.innerText = '🔍 זהה וסמן כלים חדשים'; }
+            return;
+        }
+
+        const batch = writeBatch(db);
+        newTools.forEach(p => {
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'toolsRegistry', String(p.id));
+            batch.set(ref, {
+                title: p.title,
+                description: p.description,
+                category: p.category,
+                addedAt: serverTimestamp()
+            });
+        });
+        await batch.commit();
+
+        if (statusEl) {
+            statusEl.innerText = `✅ ${newTools.length} כלים חדשים נרשמו: ${newTools.map(p => p.title).join(', ')}`;
+            statusEl.style.color = '#10b981';
+            statusEl.style.display = 'block';
+            setTimeout(() => statusEl.style.display = 'none', 6000);
+        }
+    } catch(e) {
+        alert('שגיאה: ' + e.message);
+    }
+    if (btn) { btn.disabled = false; btn.innerText = '🔍 זהה וסמן כלים חדשים'; }
+};
+
+// --- Admin: מילוי אוטומטי לפי Firestore (7 ימים) ---
+window.autoFillWhatsNew = async function() {
+    const btn = document.getElementById('autoFillBtn');
+    if (btn) { btn.disabled = true; btn.innerText = 'טוען...'; }
+    const statusEl = document.getElementById('whatsNewSaveStatus');
+
+    try {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 7);
+
+        const toolsRegistryRef = collection(db, 'artifacts', appId, 'public', 'data', 'toolsRegistry');
+        const snap = await getDocs(toolsRegistryRef);
+        const recentTools = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(t => t.addedAt && t.addedAt.toDate() >= cutoff)
+            .sort((a, b) => (b.addedAt.seconds || 0) - (a.addedAt.seconds || 0));
+
+        if (recentTools.length === 0) {
+            if (statusEl) {
+                statusEl.innerText = 'לא נמצאו כלים שנוספו ב-7 הימים האחרונים.';
+                statusEl.style.color = '#f59e0b';
+                statusEl.style.display = 'block';
+                setTimeout(() => { statusEl.style.display = 'none'; statusEl.style.color = '#10b981'; }, 4000);
+            }
+            if (btn) { btn.disabled = false; btn.innerText = '✨ מלא אוטומטית (7 ימים)'; }
+            return;
+        }
+
+        const today = new Date().toLocaleDateString('he-IL');
+        const titleEl = document.getElementById('whatsNewTitle');
+        const contentEl = document.getElementById('whatsNewContent');
+
+        if (!titleEl.value.trim()) {
+            titleEl.value = `🆕 חדש באתר! (${today})`;
+        }
+
+        const lines = recentTools.map(p => `• ${p.title} — ${p.description}`);
+        const existing = contentEl.value.trim();
+        contentEl.value = existing ? existing + '\n' + lines.join('\n') : lines.join('\n');
+
+        contentEl.style.borderColor = '#6366f1';
+        setTimeout(() => contentEl.style.borderColor = '', 1500);
+
+        if (statusEl) {
+            statusEl.innerText = `✨ נמצאו ${recentTools.length} כלים חדשים — נוספו לתוכן. אל תשכח לשמור!`;
+            statusEl.style.color = '#818cf8';
+            statusEl.style.display = 'block';
+            setTimeout(() => { statusEl.style.display = 'none'; statusEl.style.color = '#10b981'; }, 5000);
+        }
+    } catch(e) {
+        alert('שגיאה בטעינה: ' + e.message);
+    }
+    if (btn) { btn.disabled = false; btn.innerText = '✨ מלא אוטומטית (7 ימים)'; }
+};
+
