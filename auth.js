@@ -111,9 +111,23 @@ async function doLogin(fName, lName, userId) {
         window.userChoices = (userDoc.exists() && userDoc.data().myChoices) ? userDoc.data().myChoices : [];
     } catch (e) { window.userChoices = []; }
 
+    // טעינת מסך "מה חדש" מהענן
+    let whatsNewData = null;
+    try {
+        const wnRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'whatsNew');
+        const wnSnap = await getDoc(wnRef);
+        if (wnSnap.exists()) {
+            const d = wnSnap.data();
+            if (d.enabled) whatsNewData = d;
+        }
+    } catch(e) { console.warn('WhatsNew fetch failed:', e); }
+
     setTimeout(() => {
         welcomeOverlay.style.display = 'none';
         showDashboard();
+        if (whatsNewData) {
+            setTimeout(() => showWhatsNewModal(whatsNewData), 400);
+        }
     }, 1800);
 }
 
@@ -122,6 +136,7 @@ async function showAdminPanel() {
     dashboardView.style.display = 'none';
     adminManagementView.style.display = 'block';
     await loadUserListFromDB();
+    if (window.loadWhatsNew) await window.loadWhatsNew();
 }
 
 function renderUserList() {
@@ -523,3 +538,110 @@ window.deleteSuggestion = async function(id) {
         alert('שגיאה במחיקה.');
     }
 };
+
+// ===== מסך "מה חדש" — popup =====
+
+function showWhatsNewModal(data) {
+    const modal = document.getElementById('whatsNewModal');
+    const titleEl = document.getElementById('whatsNewModalTitle');
+    const bodyEl = document.getElementById('whatsNewModalBody');
+    if (!modal) return;
+    titleEl.innerText = data.title || '🆕 חדש באתר!';
+    bodyEl.innerText = data.content || '';
+    modal.style.display = 'flex';
+}
+
+window.closeWhatsNewModal = function() {
+    const modal = document.getElementById('whatsNewModal');
+    if (modal) modal.style.display = 'none';
+};
+
+// --- Admin: טעינת נתוני whatsNew ---
+window.loadWhatsNew = async function() {
+    const badge = document.getElementById('whatsNewStatusBadge');
+    const toggleBtn = document.getElementById('whatsNewToggleBtn');
+    const knob = document.getElementById('whatsNewToggleKnob');
+    try {
+        const wnRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'whatsNew');
+        const wnSnap = await getDoc(wnRef);
+        if (wnSnap.exists()) {
+            const d = wnSnap.data();
+            document.getElementById('whatsNewTitle').value = d.title || '';
+            document.getElementById('whatsNewContent').value = d.content || '';
+            setToggleUI(d.enabled);
+        } else {
+            setToggleUI(false);
+        }
+    } catch(e) {
+        if (badge) { badge.innerText = 'שגיאה בטעינה'; badge.style.background = '#ef4444'; badge.style.color = 'white'; }
+        console.error(e);
+    }
+};
+
+function setToggleUI(enabled) {
+    const badge = document.getElementById('whatsNewStatusBadge');
+    const toggleBtn = document.getElementById('whatsNewToggleBtn');
+    const knob = document.getElementById('whatsNewToggleKnob');
+    if (!badge || !toggleBtn || !knob) return;
+    if (enabled) {
+        badge.innerText = '✅ מופעל';
+        badge.style.background = 'rgba(16,185,129,0.2)';
+        badge.style.color = '#10b981';
+        badge.style.border = '1px solid #10b981';
+        toggleBtn.style.background = '#10b981';
+        knob.style.transform = 'translateX(36px)';
+    } else {
+        badge.innerText = '⏸ כבוי';
+        badge.style.background = 'rgba(100,116,139,0.2)';
+        badge.style.color = '#94a3b8';
+        badge.style.border = '1px solid #475569';
+        toggleBtn.style.background = '#475569';
+        knob.style.transform = 'translateX(1px)';
+    }
+    toggleBtn.dataset.enabled = enabled ? 'true' : 'false';
+}
+
+// --- Admin: החלפת מצב הפעלה/כיבוי ---
+window.toggleWhatsNew = async function() {
+    const toggleBtn = document.getElementById('whatsNewToggleBtn');
+    const currentlyEnabled = toggleBtn.dataset.enabled === 'true';
+    const newEnabled = !currentlyEnabled;
+    try {
+        const wnRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'whatsNew');
+        await setDoc(wnRef, { enabled: newEnabled }, { merge: true });
+        setToggleUI(newEnabled);
+    } catch(e) {
+        alert('שגיאה בשמירת הסטטוס: ' + e.message);
+    }
+};
+
+// --- Admin: שמירת תוכן whatsNew ---
+window.saveWhatsNew = async function() {
+    const title = document.getElementById('whatsNewTitle').value.trim();
+    const content = document.getElementById('whatsNewContent').value.trim();
+    const statusEl = document.getElementById('whatsNewSaveStatus');
+    if (!title || !content) {
+        alert('נא למלא כותרת ותוכן לפני השמירה.');
+        return;
+    }
+    try {
+        const wnRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'whatsNew');
+        await setDoc(wnRef, { title, content, updatedAt: serverTimestamp() }, { merge: true });
+        statusEl.innerText = '✅ נשמר בהצלחה!';
+        statusEl.style.display = 'block';
+        setTimeout(() => statusEl.style.display = 'none', 3000);
+    } catch(e) {
+        alert('שגיאה בשמירה: ' + e.message);
+    }
+};
+
+// --- Admin: תצוגה מקדימה ---
+window.previewWhatsNew = function() {
+    const title = document.getElementById('whatsNewTitle').value || '🆕 חדש באתר!';
+    const content = document.getElementById('whatsNewContent').value || '(אין תוכן)';
+    showWhatsNewModal({ title, content, enabled: true });
+    // הצג את המודל גם בלי לעבור ל-dashboard
+    const modal = document.getElementById('whatsNewModal');
+    if (modal) modal.style.display = 'flex';
+};
+

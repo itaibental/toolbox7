@@ -63,6 +63,19 @@
             <!-- Presentation cards will be injected here -->
         </div>
 
+        <!-- What's New Modal -->
+        <div id="whatsNewModal" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.85); z-index:2000; align-items:center; justify-content:center; padding:1rem;">
+            <div style="background:#1e293b; border:1px solid rgba(251,146,60,0.4); border-radius:12px; max-width:480px; width:100%; padding:2rem; position:relative; box-shadow:0 0 60px rgba(251,146,60,0.15); animation: fadeInUp 0.4s ease;">
+                <div style="text-align:center; margin-bottom:1.5rem;">
+                    <div style="font-size:2.5rem; margin-bottom:0.5rem;">🆕</div>
+                    <h2 id="whatsNewModalTitle" style="font-size:1.6rem; font-weight:900; color:#fb923c; margin-bottom:0.25rem;"></h2>
+                    <p style="color:#64748b; font-size:0.85rem;">עדכון אחרון מהמנהל</p>
+                </div>
+                <div id="whatsNewModalBody" style="color:#e2e8f0; font-size:1rem; line-height:2; white-space:pre-wrap; background:rgba(15,23,42,0.5); border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.5rem; max-height:280px; overflow-y:auto;"></div>
+                <button onclick="closeWhatsNewModal()" style="width:100%; background:#fb923c; color:white; font-weight:800; padding:12px; border-radius:6px; border:none; cursor:pointer; font-size:1rem; transition:background 0.2s;" onmouseover="this.style.background='#f97316'" onmouseout="this.style.background='#fb923c'">הבנתי, בואו נתחיל! 🚀</button>
+            </div>
+        </div>
+
         <!-- Info Modal -->
         <div id="infoModal" class="modal-overlay" onclick="closeModal()">
             <div class="modal-content" onclick="event.stopPropagation()">
@@ -227,6 +240,44 @@
                 <div id="loginLogList" class="max-h-72 overflow-y-auto">
                     <p class="text-slate-400 text-sm text-center">לחץ "טען נתונים" לטעינה</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- What's New Popup Section -->
+        <div class="mt-10">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-orange-400">🆕 חדשות ועדכונים — מסך קופץ</h2>
+                <div class="flex gap-2 items-center">
+                    <span id="whatsNewStatusBadge" class="text-xs font-bold px-3 py-1 rounded-full">טוען...</span>
+                    <button onclick="loadWhatsNew()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold py-2 px-4 rounded transition-all">רענן</button>
+                </div>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-lg">
+                <!-- Toggle -->
+                <div class="flex items-center justify-between mb-6 pb-5 border-b border-slate-700">
+                    <div>
+                        <p class="text-white font-bold text-base">הצגת המסך הקופץ בכניסה</p>
+                        <p class="text-slate-400 text-sm mt-1">כשמופעל — כל משתמש יראה את המסך פעם אחת בעת הכניסה</p>
+                    </div>
+                    <button id="whatsNewToggleBtn" onclick="toggleWhatsNew()" class="relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none bg-slate-600">
+                        <span id="whatsNewToggleKnob" class="inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform duration-300 translate-x-1"></span>
+                    </button>
+                </div>
+
+                <!-- Editor -->
+                <div class="mb-4">
+                    <label class="input-label mb-2 block">כותרת המסך הקופץ</label>
+                    <input type="text" id="whatsNewTitle" class="main-input" placeholder="לדוגמה: 🎉 חדש באתר!" value="">
+                </div>
+                <div class="mb-4">
+                    <label class="input-label mb-2 block">תוכן — רשמו כל פריט בשורה חדשה</label>
+                    <textarea id="whatsNewContent" rows="7" class="main-input" style="resize:vertical; font-family: inherit; line-height:1.7;" placeholder="• Suno — יצירת מוזיקה עם AI&#10;• Affinity Studio — עיצוב מקצועי חינמי&#10;• Chrome Music Lab — ניסויים מוזיקליים"></textarea>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="saveWhatsNew()" class="bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-6 rounded transition-all">💾 שמור תוכן</button>
+                    <button onclick="previewWhatsNew()" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded transition-all">👁 תצוגה מקדימה</button>
+                </div>
+                <p id="whatsNewSaveStatus" class="text-sm mt-3 text-green-400" style="display:none;"></p>
             </div>
         </div>
 
